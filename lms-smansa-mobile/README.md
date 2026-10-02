@@ -490,12 +490,6 @@ flutter test            # Unit tests (belum banyak test case)
 
 ---
 
-## 👥 Kontributor
-
-- **fkhdz** (Fiko Hilmy Dzaky) — Developer utama
-
----
-
 ## 📄 Lisensi
 
 Proyek internal **SMA Negeri 1 Bumiayu**. Belum dipublikasikan ke publik (`publish_to: 'none'` di `pubspec.yaml`).
