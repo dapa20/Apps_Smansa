@@ -6,6 +6,7 @@ import '../../core/api/api_repository.dart';
 import '../../core/api/auth_service.dart';
 import '../../widgets/back_button_overlay.dart';
 import '../../app/routes.dart';
+import '../../app/notification_badge_controller.dart';
 
 class PengaturanAkunScreen extends StatefulWidget {
   const PengaturanAkunScreen({super.key});
@@ -130,6 +131,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     if (confirmed != true) return;
     if (!mounted) return;
     await AuthService.instance.logout();
+    NotificationBadgeController.instance.reset();
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
       context,

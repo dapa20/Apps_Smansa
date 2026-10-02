@@ -7,6 +7,7 @@ import '../../core/api/auth_service.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/stat_card.dart';
 import '../../app/routes.dart';
+import '../../app/notification_badge_controller.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -74,6 +75,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
     if (!mounted) return;
 
     await AuthService.instance.logout();
+    NotificationBadgeController.instance.reset();
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
       context,

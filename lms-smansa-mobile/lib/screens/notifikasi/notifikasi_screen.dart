@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
+import '../../app/notification_badge_controller.dart';
 
 class NotifikasiScreen extends StatefulWidget {
   const NotifikasiScreen({super.key});
@@ -20,6 +21,8 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
   @override
   void initState() {
     super.initState();
+    // Tandai semua notifikasi sudah dibaca saat user masuk tab ini
+    NotificationBadgeController.instance.markAllAsRead();
     _load();
   }
 

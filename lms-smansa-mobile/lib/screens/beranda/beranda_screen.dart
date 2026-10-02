@@ -9,6 +9,7 @@ import '../../widgets/section_header.dart';
 import '../../widgets/status_chip.dart';
 import '../../app/routes.dart';
 import '../../app/main_shell_controller.dart';
+import '../../app/notification_badge_controller.dart';
 
 class BerandaScreen extends StatefulWidget {
   const BerandaScreen({super.key});
@@ -47,6 +48,19 @@ class _BerandaScreenState extends State<BerandaScreen> {
   void initState() {
     super.initState();
     _load();
+    // Refresh badge notifikasi & listen perubahannya
+    NotificationBadgeController.instance.addListener(_onBadgeChanged);
+    NotificationBadgeController.instance.refresh();
+  }
+
+  @override
+  void dispose() {
+    NotificationBadgeController.instance.removeListener(_onBadgeChanged);
+    super.dispose();
+  }
+
+  void _onBadgeChanged() {
+    if (mounted) setState(() {}); // rebuild header untuk update badge
   }
 
   Future<void> _load() async {
@@ -217,18 +231,11 @@ class _BerandaScreenState extends State<BerandaScreen> {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {},
-                    ),
-                    const CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white24,
-                      child: Icon(Icons.person, color: Colors.white),
-                    ),
+                    // Tombol notifikasi + badge merah
+                    _buildNotificationButton(context),
+                    const SizedBox(width: 8),
+                    // Tombol profile avatar
+                    _buildProfileButton(context),
                   ],
                 ),
               ],
@@ -285,6 +292,88 @@ class _BerandaScreenState extends State<BerandaScreen> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationButton(BuildContext context) {
+    final badge = NotificationBadgeController.instance;
+    final showBadge = badge.loaded && badge.hasUnread;
+
+    return Tooltip(
+      message: 'Notifikasi',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            // Pindah ke tab Notifikasi (index 1 di MainShell)
+            MainShellController.instance.switchToTab(1);
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.notifications,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              if (showBadge)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: AppColors.dangerRed,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.dangerRed.withValues(alpha: 0.5),
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileButton(BuildContext context) {
+    return Tooltip(
+      message: 'Profil',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.dataDiri);
+          },
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.person, color: Colors.white, size: 22),
+          ),
         ),
       ),
     );
