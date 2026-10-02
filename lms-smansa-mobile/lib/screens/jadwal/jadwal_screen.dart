@@ -4,6 +4,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
+import '../../widgets/back_button_overlay.dart';
 
 class JadwalScreen extends StatefulWidget {
   const JadwalScreen({super.key});
@@ -74,6 +75,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(AppConstants.appName, style: AppTextStyles.cardTitle),
         actions: [

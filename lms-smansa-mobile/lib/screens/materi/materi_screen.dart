@@ -4,6 +4,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
+import '../../widgets/back_button_overlay.dart';
 
 class MateriScreen extends StatefulWidget {
   const MateriScreen({super.key});
@@ -51,6 +52,7 @@ class _MateriScreenState extends State<MateriScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(AppConstants.appName, style: AppTextStyles.cardTitle),
         actions: [
@@ -268,6 +270,7 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(
           mapel?['nama_mapel'] ?? 'Materi',

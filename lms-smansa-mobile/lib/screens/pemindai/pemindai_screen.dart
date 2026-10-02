@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../widgets/back_button_overlay.dart';
 
 class PemindaiScreen extends StatefulWidget {
   const PemindaiScreen({super.key});
@@ -35,6 +36,7 @@ class _PemindaiScreenState extends State<PemindaiScreen> with SingleTickerProvid
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: const BackLeadingButton(color: Colors.white),
         title: Text('Pemindai Kartu', style: AppTextStyles.headerTitle),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [

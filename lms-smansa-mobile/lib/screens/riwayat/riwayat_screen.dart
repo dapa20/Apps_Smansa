@@ -5,6 +5,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/section_header.dart';
+import '../../widgets/back_button_overlay.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -67,6 +68,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: const BackLeadingButton(),
         title: Text(
           AppConstants.appName,
           style: AppTextStyles.headerTitle.copyWith(

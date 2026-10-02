@@ -3,6 +3,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
 import '../../data/mock_data.dart';
+import '../../widgets/back_button_overlay.dart';
 
 class DataDiriScreen extends StatelessWidget {
   const DataDiriScreen({super.key});
@@ -15,6 +16,7 @@ class DataDiriScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
+        leading: const BackLeadingButton(color: Colors.white),
         title: Text('Data Diri', style: AppTextStyles.headerTitle.copyWith(fontSize: 18)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

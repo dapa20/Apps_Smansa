@@ -7,6 +7,7 @@ import '../../models/portal_item.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/search_bar_widget.dart';
 import '../../widgets/section_header.dart';
+import '../../widgets/back_button_overlay.dart';
 
 class SmansagoScreen extends StatelessWidget {
   const SmansagoScreen({super.key});
@@ -15,76 +16,81 @@ class SmansagoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
               children: [
-                const BlueHeader(
-                  title: 'SMANSAGO',
-                  subtitle: 'Digital Hub SMAN 1',
-                  trailing: Icon(Icons.school, color: Colors.white, size: 40),
-                  height: 180,
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const BlueHeader(
+                      title: 'SMANSAGO',
+                      subtitle: 'Digital Hub SMAN 1',
+                      trailing: Icon(Icons.school, color: Colors.white, size: 40),
+                      height: 180,
+                    ),
+                    Positioned(
+                      bottom: -24,
+                      left: 0,
+                      right: 0,
+                      child: const SearchBarWidget(hint: 'Cari tautan atau portal...'),
+                    ),
+                  ],
                 ),
-                Positioned(
-                  bottom: -24,
-                  left: 0,
-                  right: 0,
-                  child: const SearchBarWidget(hint: 'Cari tautan atau portal...'),
+                const SizedBox(height: 50),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildMainPortalCard(),
                 ),
+
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 1.1,
+                    ),
+                    itemCount: MockSmansago.portals.length,
+                    itemBuilder: (context, index) {
+                      return _buildGridPortalCard(MockSmansago.portals[index]);
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: SectionHeader(title: 'Sosial Media Resmi'),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: MockSmansago.socialMedia.map((social) {
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: _buildSocialCard(social),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
               ],
             ),
-            const SizedBox(height: 50),
-            
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildMainPortalCard(),
-            ),
-            
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.1,
-                ),
-                itemCount: MockSmansago.portals.length,
-                itemBuilder: (context, index) {
-                  return _buildGridPortalCard(MockSmansago.portals[index]);
-                },
-              ),
-            ),
-            
-            const SizedBox(height: 32),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: SectionHeader(title: 'Sosial Media Resmi'),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: MockSmansago.socialMedia.map((social) {
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: _buildSocialCard(social),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            
-            const SizedBox(height: 40),
-          ],
-        ),
+          ),
+          const BackButtonOverlay(),
+        ],
       ),
     );
   }

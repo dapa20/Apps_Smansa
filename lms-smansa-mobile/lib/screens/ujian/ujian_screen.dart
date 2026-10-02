@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../data/mock_data.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
+import '../../widgets/back_button_overlay.dart';
 import 'package:intl/intl.dart';
 
 class UjianScreen extends StatelessWidget {
@@ -15,28 +16,35 @@ class UjianScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Column(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: const BackLeadingButton(),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        title: Text(
+          AppConstants.appName,
+          style: AppTextStyles.cardTitle.copyWith(
+            color: AppColors.primaryBlue,
+            fontSize: 18,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BlueHeader(
-                  leading: Row(
-                    children: [
-                      const Icon(Icons.assignment, color: Colors.white70, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        'PORTAL EVALUASI',
-                        style: GoogleFonts.inter(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ],
-                  ),
                   title: 'Ujian & Kuis Aktif',
                   subtitle: 'Kerjakan ujian dengan jujur dan tepat waktu',
                   height: 220,
@@ -48,14 +56,14 @@ class UjianScreen extends StatelessWidget {
                 const SizedBox(height: 30),
               ],
             ),
-            Positioned(
-              top: 155,
-              left: AppConstants.screenPadding,
-              right: AppConstants.screenPadding,
-              child: _buildInstruksiCard(),
-            ),
-          ],
-        ),
+          ),
+          Positioned(
+            top: 195,
+            left: AppConstants.screenPadding,
+            right: AppConstants.screenPadding,
+            child: _buildInstruksiCard(),
+          ),
+        ],
       ),
     );
   }

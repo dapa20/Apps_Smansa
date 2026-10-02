@@ -9,7 +9,11 @@ class ApiConfig {
   ApiConfig._();
 
   /// Base URL backend (tanpa trailing slash).
-  static const String baseUrl = 'http://10.0.2.2/lms-smansa';
+  ///
+  /// - **Chrome (web)**: gunakan `http://localhost/lms-smansa`.
+  /// - **Emulator Android**: gunakan `http://10.0.2.2/lms-smansa`.
+  /// - **Perangkat fisik Android**: gunakan IP LAN PC, mis. `http://192.168.1.10/lms-smansa`.
+  static const String baseUrl = 'http://localhost/lms-smansa';
 
   /// Root path API (tanpa trailing slash).
   static const String apiPath = '$baseUrl/api';

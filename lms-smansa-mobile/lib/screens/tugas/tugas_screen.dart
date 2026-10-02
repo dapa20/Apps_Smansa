@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
+import '../../widgets/back_button_overlay.dart';
 import 'package:intl/intl.dart';
 
 class TugasScreen extends StatefulWidget {
@@ -72,31 +73,34 @@ class _TugasScreenState extends State<TugasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: const BackLeadingButton(),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        title: Text(
+          AppConstants.appName,
+          style: AppTextStyles.cardTitle.copyWith(
+            color: AppColors.primaryBlue,
+            fontSize: 18,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
               children: [
                 BlueHeader(
-                  leading: Row(
-                    children: [
-                      const Icon(Icons.school, color: Colors.white, size: 24),
-                      const SizedBox(width: 8),
-                      Text(
-                        'SMANSA',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  trailing: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.white,
-                  ),
                   title: 'Tugas Saya',
                   subtitle:
                       'Kelola dan pantau tugas akademik Anda dengan mudah',
@@ -112,14 +116,14 @@ class _TugasScreenState extends State<TugasScreen> {
                 const SizedBox(height: 30),
               ],
             ),
-            Positioned(
-              top: 155,
-              left: AppConstants.screenPadding,
-              right: AppConstants.screenPadding,
-              child: _buildPillTabs(),
-            ),
-          ],
-        ),
+          ),
+          Positioned(
+            top: 175,
+            left: AppConstants.screenPadding,
+            right: AppConstants.screenPadding,
+            child: _buildPillTabs(),
+          ),
+        ],
       ),
     );
   }
