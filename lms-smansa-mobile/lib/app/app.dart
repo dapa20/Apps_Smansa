@@ -12,6 +12,7 @@ import '../screens/riwayat/riwayat_screen.dart';
 import '../screens/smansago/smansago_screen.dart';
 import '../screens/pemindai/pemindai_screen.dart';
 import '../screens/profil/data_diri_screen.dart';
+import '../screens/profil/pengaturan_akun_screen.dart';
 import '../screens/materi/materi_screen.dart';
 
 class LmsSmansaApp extends StatelessWidget {
@@ -37,6 +38,7 @@ class LmsSmansaApp extends StatelessWidget {
         AppRoutes.pemindai: (_) => const PemindaiScreen(),
         AppRoutes.dataDiri: (_) => const DataDiriScreen(),
         AppRoutes.materi: (_) => const MateriScreen(),
+        AppRoutes.pengaturanAkun: (_) => const PengaturanAkunScreen(),
       },
     );
   }

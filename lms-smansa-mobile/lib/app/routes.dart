@@ -12,4 +12,6 @@ class AppRoutes {
   static const String pemindai = '/pemindai';
   static const String dataDiri = '/profil/data-diri';
   static const String materi = '/materi';
+  static const String berita = '/berita';
+  static const String pengaturanAkun = '/profil/pengaturan';
 }

@@ -118,4 +118,23 @@ class ApiRepository {
     final res = await _client.get('/profil.php');
     return res['data'] as Map<String, dynamic>;
   }
+
+  /// Ubah password siswa.
+  /// Return [success] = true kalau berhasil, false kalau gagal.
+  /// [message] berisi pesan dari server (untuk ditampilkan ke user).
+  Future<Map<String, dynamic>> updatePassword({
+    required String passwordLama,
+    required String passwordBaru,
+    required String passwordKonfirmasi,
+  }) async {
+    final res = await _client.post(
+      '/password_update.php',
+      body: {
+        'password_lama': passwordLama,
+        'password_baru': passwordBaru,
+        'password_konfirmasi': passwordKonfirmasi,
+      },
+    );
+    return res;
+  }
 }

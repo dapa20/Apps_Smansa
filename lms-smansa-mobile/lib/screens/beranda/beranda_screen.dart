@@ -8,6 +8,7 @@ import '../../widgets/search_bar_widget.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/status_chip.dart';
 import '../../app/routes.dart';
+import '../../app/main_shell_controller.dart';
 
 class BerandaScreen extends StatefulWidget {
   const BerandaScreen({super.key});
@@ -137,7 +138,10 @@ class _BerandaScreenState extends State<BerandaScreen> {
           SectionHeader(
             title: 'Berita Terbaru',
             actionLabel: 'Lihat Semua',
-            onActionTap: () {},
+            onActionTap: () {
+              // Pindah ke tab Berita di MainShell (index 2)
+              MainShellController.instance.switchToTab(2);
+            },
           ),
           const SizedBox(height: 16),
           _buildPengumumanHorizontal(),
@@ -145,7 +149,10 @@ class _BerandaScreenState extends State<BerandaScreen> {
           SectionHeader(
             title: 'Materi Terbaru',
             actionLabel: 'Lihat Semua',
-            onActionTap: () {},
+            onActionTap: () {
+              // Buka halaman Materi sebagai halaman penuh dengan back button
+              Navigator.pushNamed(context, AppRoutes.materi);
+            },
           ),
           const SizedBox(height: 16),
           _buildMateriTerbaru(),

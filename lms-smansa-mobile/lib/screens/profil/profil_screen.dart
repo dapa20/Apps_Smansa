@@ -184,12 +184,11 @@ class _ProfilScreenState extends State<ProfilScreen> {
                       context: context,
                       icon: Icons.settings_outlined,
                       title: 'Pengaturan Akun',
-                      subtitle: 'Ubah password dan privasi',
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Fitur belum tersedia')),
-                        );
-                      },
+                      subtitle: 'Ubah password dan kelola akun',
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        AppRoutes.pengaturanAkun,
+                      ),
                     ),
                   ],
                 ),

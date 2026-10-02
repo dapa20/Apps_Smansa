@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_nav_bar.dart';
+import '../app/main_shell_controller.dart';
 import 'beranda/beranda_screen.dart';
 import 'notifikasi/notifikasi_screen.dart';
 import 'berita/berita_screen.dart';
@@ -22,6 +23,27 @@ class _MainShellState extends State<MainShell> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Sinkronkan index MainShell dengan controller global
+    MainShellController.instance.addListener(_onControllerChanged);
+    _currentIndex = MainShellController.instance.currentIndex;
+  }
+
+  @override
+  void dispose() {
+    MainShellController.instance.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (!mounted) return;
+    setState(() {
+      _currentIndex = MainShellController.instance.currentIndex;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
@@ -30,7 +52,9 @@ class _MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          MainShellController.instance.switchToTab(index);
+        },
       ),
     );
   }
