@@ -2,10 +2,6 @@ import 'package:flutter/foundation.dart';
 import '../core/api/api_repository.dart';
 
 /// Controller global untuk status notifikasi siswa. Dipakai oleh BerandaScreen
-/// (badge merah di icon bell) dan NotifikasiScreen (penanda sudah dibaca).
-///
-/// Logika sederhana: "baru" diartikan sebagai pengumuman yang ada di database
-/// (siapapun yang datanya belum pernah dilihat). Tidak butuh schema tambahan.
 class NotificationBadgeController extends ChangeNotifier {
   NotificationBadgeController._();
   static final NotificationBadgeController instance =
@@ -20,7 +16,6 @@ class NotificationBadgeController extends ChangeNotifier {
   bool get loaded => _loaded;
   bool get loading => _loading;
 
-  /// Hitung jumlah notifikasi (pengumuman) dari API.
   Future<void> refresh() async {
     if (_loading) return;
     _loading = true;
@@ -29,15 +24,13 @@ class NotificationBadgeController extends ChangeNotifier {
       _unreadCount = list.length;
       _loaded = true;
     } catch (_) {
-      // Jika gagal (mis. offline), biarkan nilai lama.
-      // Loaded tetap false → badge tidak ditampilkan.
+      
     } finally {
       _loading = false;
       notifyListeners();
     }
   }
 
-  /// Tandai semua sudah dibaca (dipanggil ketika user masuk ke tab Notifikasi).
   void markAllAsRead() {
     if (_unreadCount > 0) {
       _unreadCount = 0;
@@ -45,7 +38,6 @@ class NotificationBadgeController extends ChangeNotifier {
     }
   }
 
-  /// Reset (untuk logout).
   void reset() {
     _unreadCount = 0;
     _loaded = false;
