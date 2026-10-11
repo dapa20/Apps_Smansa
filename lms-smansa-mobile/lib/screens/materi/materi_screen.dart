@@ -52,18 +52,16 @@ class _MateriScreenState extends State<MateriScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        title: Text(AppConstants.appName, style: AppTextStyles.cardTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
+        title: Text(
+          AppConstants.appName,
+          style: AppTextStyles.cardTitle.copyWith(
+            color: AppColors.primaryBlue,
+            fontSize: 18,
           ),
-        ],
+        ),
       ),
       body: Column(
         children: [
@@ -80,7 +78,12 @@ class _MateriScreenState extends State<MateriScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: AppColors.primaryBlue,
+        ),
+      );
     }
 
     if (_error != null) {
@@ -90,12 +93,20 @@ class _MateriScreenState extends State<MateriScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.cloud_off,
-                size: 48,
-                color: AppColors.textSecondary,
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.cloud_off_rounded,
+                  size: 36,
+                  color: AppColors.textSecondary,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
@@ -111,7 +122,31 @@ class _MateriScreenState extends State<MateriScreen> {
 
     final mapelList = _daftarMapel ?? [];
     if (mapelList.isEmpty) {
-      return const Center(child: Text('Belum ada materi untuk kelas Anda.'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.folder_off_rounded,
+                size: 40,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Belum ada materi untuk kelas Anda',
+              style: AppTextStyles.bodySecondary,
+            ),
+          ],
+        ),
+      );
     }
 
     return ListView.builder(
@@ -125,95 +160,92 @@ class _MateriScreenState extends State<MateriScreen> {
   }
 
   Widget _buildMapelCard(Map<String, dynamic> mapel) {
-    return GestureDetector(
-      onTap: () {
-        final id = mapel['id'];
-        if (id != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => MateriDetailScreen(mapelId: id as int),
-            ),
-          );
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-          border: const Border(
-            left: BorderSide(
-              color: AppColors.primaryBlue,
-              width: AppConstants.leftBorderWidth,
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          final id = mapel['id'];
+          if (id != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MateriDetailScreen(mapelId: id as int),
+              ),
+            );
+          }
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderSubtle, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+                spreadRadius: -2,
+              ),
+            ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.cardShadow,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.chipBlueBg,
-                borderRadius: BorderRadius.circular(12),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  color: AppColors.primaryBlue,
+                  size: 24,
+                ),
               ),
-              child: const Icon(
-                Icons.menu_book,
-                color: AppColors.primaryBlue,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    mapel['nama_mapel'] ?? '-',
-                    style: AppTextStyles.cardTitle,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    mapel['nama_guru'] ?? '',
-                    style: AppTextStyles.smallText,
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.chipBlueBg,
-                    borderRadius: BorderRadius.circular(
-                      AppConstants.chipRadius,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      mapel['nama_mapel'] ?? '-',
+                      style: AppTextStyles.cardTitle,
                     ),
-                  ),
-                  child: Text(
-                    '${mapel['jumlah_materi'] ?? 0} Materi',
-                    style: AppTextStyles.chipText.copyWith(
-                      color: AppColors.primaryBlue,
+                    const SizedBox(height: 4),
+                    Text(
+                      mapel['nama_guru'] ?? '',
+                      style: AppTextStyles.smallText,
                     ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '${mapel['jumlah_materi'] ?? 0} Materi',
+                  style: AppTextStyles.chipText.copyWith(
+                    color: AppColors.primaryBlue,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textTertiary,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -270,11 +302,15 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(
           mapel?['nama_mapel'] ?? 'Materi',
-          style: AppTextStyles.cardTitle,
+          style: AppTextStyles.cardTitle.copyWith(
+            color: AppColors.primaryBlue,
+            fontSize: 16,
+          ),
         ),
       ),
       body: _buildBody(),
@@ -283,7 +319,12 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: AppColors.primaryBlue,
+        ),
+      );
     }
 
     if (_error != null) {
@@ -293,12 +334,20 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.cloud_off,
-                size: 48,
-                color: AppColors.textSecondary,
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.cloud_off_rounded,
+                  size: 36,
+                  color: AppColors.textSecondary,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
@@ -319,15 +368,36 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
       padding: const EdgeInsets.all(20),
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderSubtle, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+                spreadRadius: -2,
+              ),
+            ],
           ),
           child: Row(
             children: [
-              const Icon(Icons.school, color: AppColors.primaryBlue),
-              const SizedBox(width: 12),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.school_rounded,
+                  color: AppColors.primaryBlue,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,9 +418,32 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
         ),
         const SizedBox(height: 20),
         if (sections.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: Text('Belum ada materi pada mapel ini.')),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: Column(
+                children: [
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceMuted,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.folder_open_rounded,
+                      size: 40,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Belum ada materi pada mapel ini',
+                    style: AppTextStyles.bodySecondary,
+                  ),
+                ],
+              ),
+            ),
           )
         else
           ...sections.map((section) {
@@ -364,10 +457,19 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
 
   Widget _buildSectionCard(Map<String, dynamic> section, List<dynamic> items) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: -2,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,8 +478,20 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const Icon(Icons.folder, color: AppColors.accentYellow),
-                const SizedBox(width: 8),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.chipYellowBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.folder_rounded,
+                    color: AppColors.chipYellowText,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     section['judul'] ?? 'Section',
@@ -401,16 +515,16 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
     IconData icon;
     switch (item['tipe']) {
       case 'file':
-        icon = Icons.insert_drive_file;
+        icon = Icons.insert_drive_file_rounded;
         break;
       case 'link':
-        icon = Icons.link;
+        icon = Icons.link_rounded;
         break;
       case 'video':
-        icon = Icons.play_circle;
+        icon = Icons.play_circle_outline_rounded;
         break;
       default:
-        icon = Icons.description;
+        icon = Icons.description_rounded;
     }
 
     return InkWell(
@@ -419,18 +533,22 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
         final link = item['url_link'] as String?;
         if (url != null && url.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Membuka: ${item['judul'] ?? 'file'}')),
+            SnackBar(
+              content: Text('Membuka: ${item['judul'] ?? 'file'}'),
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         } else if (link != null && link.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Membuka link: ${item['judul'] ?? 'materi'}'),
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
             Icon(icon, color: AppColors.primaryBlue, size: 20),
@@ -441,9 +559,7 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
                 children: [
                   Text(
                     item['judul'] ?? '-',
-                    style: AppTextStyles.bodyText.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.bodyMedium,
                   ),
                   if ((item['deskripsi'] ?? '').toString().isNotEmpty)
                     Text(
@@ -455,7 +571,10 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textTertiary,
+            ),
           ],
         ),
       ),

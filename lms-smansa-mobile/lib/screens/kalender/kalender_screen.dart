@@ -9,6 +9,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
+import '../../widgets/back_button_overlay.dart';
 import '../../models/event_kalender.dart';
 
 class KalenderScreen extends StatefulWidget {
@@ -117,28 +118,16 @@ class _KalenderScreenState extends State<KalenderScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: const BackLeadingButton(),
         title: Text(
           'SMANSA Mobile LMS',
-          style: GoogleFonts.inter(
+          style: AppTextStyles.cardTitle.copyWith(
             color: AppColors.primaryBlue,
-            fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_none,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: _load,
@@ -171,13 +160,10 @@ class _KalenderScreenState extends State<KalenderScreen> {
                     Text('Agenda', style: AppTextStyles.sectionTitle),
                     TextButton.icon(
                       onPressed: _load,
-                      icon: const Icon(Icons.refresh, size: 16),
+                      icon: const Icon(Icons.refresh_rounded, size: 16),
                       label: const Text('Muat Ulang'),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,
-                        textStyle: GoogleFonts.inter(
-                          fontWeight: FontWeight.w500,
-                        ),
                       ),
                     ),
                   ],
@@ -197,12 +183,14 @@ class _KalenderScreenState extends State<KalenderScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -224,12 +212,36 @@ class _KalenderScreenState extends State<KalenderScreen> {
           titleCentered: true,
           titleTextStyle: GoogleFonts.inter(
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
+            letterSpacing: -0.2,
+          ),
+          leftChevronIcon: const Icon(
+            Icons.chevron_left_rounded,
+            color: AppColors.textSecondary,
+          ),
+          rightChevronIcon: const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          ),
+          weekendStyle: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
           ),
         ),
         calendarStyle: CalendarStyle(
-          cellMargin: const EdgeInsets.all(8.0),
+          cellMargin: const EdgeInsets.all(6.0),
+          outsideDaysVisible: false,
+          defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
+          weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
           selectedDecoration: const BoxDecoration(
             color: AppColors.primaryBlue,
             shape: BoxShape.circle,
@@ -239,7 +251,7 @@ class _KalenderScreenState extends State<KalenderScreen> {
             fontWeight: FontWeight.bold,
           ),
           todayDecoration: BoxDecoration(
-            color: AppColors.primaryBlue.withValues(alpha: 0.2),
+            color: AppColors.primaryBlue.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           todayTextStyle: const TextStyle(
@@ -250,6 +262,9 @@ class _KalenderScreenState extends State<KalenderScreen> {
             color: AppColors.primaryBlue,
             shape: BoxShape.circle,
           ),
+          markerSize: 4.0,
+          markersAlignment: Alignment.bottomCenter,
+          markerMargin: const EdgeInsets.only(top: 2),
         ),
       ),
     );
@@ -259,7 +274,12 @@ class _KalenderScreenState extends State<KalenderScreen> {
     if (_loading) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: AppColors.primaryBlue,
+          ),
+        ),
       );
     }
 
@@ -269,10 +289,18 @@ class _KalenderScreenState extends State<KalenderScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.cloud_off,
-              size: 48,
-              color: AppColors.textSecondary,
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.cloud_off_rounded,
+                size: 32,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -309,8 +337,8 @@ class _KalenderScreenState extends State<KalenderScreen> {
     final list = upcoming.isEmpty ? _events : upcoming;
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppConstants.screenPadding,
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.responsivePadding(MediaQuery.of(context).size.width),
       ),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -332,25 +360,27 @@ class _KalenderScreenState extends State<KalenderScreen> {
       margin: const EdgeInsets.only(bottom: AppConstants.itemSpacing),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            blurRadius: 5,
-            offset: Offset(0, 2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: -2,
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            width: 70,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(AppConstants.cardRadius),
-                bottomLeft: Radius.circular(AppConstants.cardRadius),
+            width: 72,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlueTint,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
               ),
             ),
             child: Column(
@@ -360,16 +390,16 @@ class _KalenderScreenState extends State<KalenderScreen> {
                   dateStr,
                   style: GoogleFonts.inter(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.primaryBlue,
+                    letterSpacing: -0.3,
                   ),
                 ),
                 Text(
                   formatterMonth.format(event.tanggalMulai).toUpperCase(),
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primaryBlue,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -404,7 +434,7 @@ class _KalenderScreenState extends State<KalenderScreen> {
                     Row(
                       children: [
                         const Icon(
-                          Icons.access_time,
+                          Icons.access_time_rounded,
                           size: 14,
                           color: AppColors.textSecondary,
                         ),
@@ -436,7 +466,9 @@ class _KalenderScreenState extends State<KalenderScreen> {
                   if (event.deskripsi != null)
                     Text(
                       event.deskripsi!,
-                      style: AppTextStyles.bodySecondary.copyWith(fontSize: 12),
+                      style: AppTextStyles.bodySecondary.copyWith(
+                        fontSize: 12,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

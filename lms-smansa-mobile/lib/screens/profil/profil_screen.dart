@@ -6,6 +6,7 @@ import '../../core/api/api_repository.dart';
 import '../../core/api/auth_service.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/stat_card.dart';
+import '../../widgets/responsive_container.dart';
 import '../../app/routes.dart';
 import '../../app/notification_badge_controller.dart';
 
@@ -56,6 +57,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Keluar'),
         content: const Text('Anda yakin ingin keluar dari akun ini?'),
         actions: [
@@ -86,89 +88,158 @@ class _ProfilScreenState extends State<ProfilScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Pakai LayoutBuilder untuk adaptasi avatar offset & header height
+    // berdasarkan lebar layar (responsif).
+    final width = MediaQuery.of(context).size.width;
+    final size = AppConstants.getScreenSize(width);
+
+    // Offset avatar dari top header. Pada layar kecil avatar lebih dekat,
+    // pada layar besar agak turun supaya lebih proporsional.
+    final double avatarOffset = size == ScreenSize.small ? 80 : 100;
+    // Extra spacer di bawah avatar supaya tidak overlap dengan stat cards.
+    final double avatarSpacer = size == ScreenSize.small ? 70 : 90;
+
     return Container(
       color: AppColors.background,
       child: SingleChildScrollView(
         child: Column(
           children: [
+            // Header + avatar overlap (Stack pattern yang clean).
             Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.topCenter,
               children: [
-                const BlueHeader(title: 'Profil Siswa', height: 160),
-                Positioned(top: 100, child: _buildAvatarSection()),
+                // 1) Header biru
+                BlueHeader(
+                  title: 'Profil Siswa',
+                  height: 170,
+                ),
+                // 2) Avatar circle — pakai Positioned dengan center alignment
+                Positioned(
+                  top: avatarOffset,
+                  left: 0,
+                  right: 0,
+                  child: _buildAvatarSection(),
+                ),
               ],
             ),
-            const SizedBox(height: 180),
+            // Spacer supaya konten berikutnya tidak tertutup avatar.
+            SizedBox(height: avatarSpacer),
 
             if (_loading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 60),
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primaryBlue,
+                ),
               )
             else if (_error != null)
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.cloud_off,
-                      size: 48,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      _error!,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.bodySecondary,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _load,
-                      child: const Text('Coba Lagi'),
-                    ),
-                  ],
+              ResponsivePadding(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.cloud_off_rounded,
+                          size: 36,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _error!,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodySecondary,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _load,
+                        child: const Text('Coba Lagi'),
+                      ),
+                    ],
+                  ),
                 ),
               )
             else ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: StatCard(
-                        label: 'STATUS KEHADIRAN',
-                        value: '${_kehadiran?['persen_hadir'] ?? 0}%',
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: StatCard(
-                        label: 'TOTAL HADIR',
-                        value:
-                            '${_kehadiran?['hadir'] ?? 0}/${_kehadiran?['total'] ?? 0}',
-                      ),
-                    ),
-                  ],
+              // Stat cards (KEHADIRAN & TOTAL HADIR) — pakai responsive padding
+              ResponsivePadding(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Pada layar sempit (<360), tampilkan stacked vertikal
+                    if (constraints.maxWidth < 280) {
+                      return Column(
+                        children: [
+                          StatCard(
+                            label: 'KEHADIRAN',
+                            value:
+                                '${_kehadiran?['persen_hadir'] ?? 0}%',
+                            icon: Icons.check_circle_outline_rounded,
+                            accentColor: AppColors.chipGreenText,
+                          ),
+                          const SizedBox(height: 12),
+                          StatCard(
+                            label: 'TOTAL HADIR',
+                            value:
+                                '${_kehadiran?['hadir'] ?? 0}/${_kehadiran?['total'] ?? 0}',
+                            icon: Icons.event_available_rounded,
+                            accentColor: AppColors.primaryBlue,
+                          ),
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: StatCard(
+                            label: 'KEHADIRAN',
+                            value:
+                                '${_kehadiran?['persen_hadir'] ?? 0}%',
+                            icon: Icons.check_circle_outline_rounded,
+                            accentColor: AppColors.chipGreenText,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: StatCard(
+                            label: 'TOTAL HADIR',
+                            value:
+                                '${_kehadiran?['hadir'] ?? 0}/${_kehadiran?['total'] ?? 0}',
+                            icon: Icons.event_available_rounded,
+                            accentColor: AppColors.primaryBlue,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
 
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const SizedBox(height: 28),
+              // Menu PENGATURAN AKUN — section title + 3 menu cards
+              ResponsivePadding(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'PENGATURAN AKUN',
-                      style: AppTextStyles.chipText.copyWith(
-                        color: AppColors.textSecondary,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 12),
+                      child: Text(
+                        'PENGATURAN AKUN',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 12),
                     _buildMenuCard(
                       context: context,
-                      icon: Icons.person_outline,
+                      icon: Icons.person_outline_rounded,
                       title: 'Data Diri',
                       subtitle: 'Lihat dan ubah data pribadimu',
                       onTap: () =>
@@ -176,7 +247,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     ),
                     _buildMenuCard(
                       context: context,
-                      icon: Icons.history,
+                      icon: Icons.history_rounded,
                       title: 'Riwayat Nilai',
                       subtitle: 'Lihat transkrip nilai akademik',
                       onTap: () =>
@@ -196,15 +267,15 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const SizedBox(height: 20),
+              // Tombol logout
+              ResponsivePadding(
                 child: _buildLogoutCard(),
               ),
             ],
 
             const SizedBox(height: 32),
-            Text(AppConstants.appVersion, style: AppTextStyles.smallText),
+            Text(AppConstants.appVersion, style: AppTextStyles.caption),
             const SizedBox(height: 40),
           ],
         ),
@@ -220,36 +291,64 @@ class _ProfilScreenState extends State<ProfilScreen> {
     return Column(
       children: [
         Container(
-          width: 100,
-          height: 100,
+          width: 104,
+          height: 104,
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: AppColors.surfaceMuted,
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white, width: 4),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+                spreadRadius: -2,
+              ),
+            ],
           ),
-          child: const Icon(Icons.person, size: 50, color: Colors.grey),
+          child: Icon(
+            Icons.person_rounded,
+            size: 52,
+            color: AppColors.textSecondary,
+          ),
         ),
-        const SizedBox(height: 12),
-        Text(nama, style: AppTextStyles.sectionTitle.copyWith(fontSize: 22)),
-        const SizedBox(height: 4),
+        const SizedBox(height: 14),
+        // Nama — batasi max width supaya tidak overflow di layar kecil
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: Text(
+            nama,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.sectionTitle.copyWith(fontSize: 22),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(height: 6),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
               Icons.badge_outlined,
-              size: 16,
+              size: 14,
               color: AppColors.textSecondary,
             ),
             const SizedBox(width: 4),
-            Text(nisn, style: AppTextStyles.bodySecondary),
+            Flexible(
+              child: Text(
+                nisn,
+                style: AppTextStyles.bodySecondary,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.chipYellowBg,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
             kelas.toUpperCase(),
@@ -269,71 +368,103 @@ class _ProfilScreenState extends State<ProfilScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.cardShadow,
-              offset: const Offset(0, 2),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.chipBlueBg,
-                shape: BoxShape.circle,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderSubtle, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+                spreadRadius: -2,
               ),
-              child: Icon(icon, color: AppColors.primaryBlue),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: AppTextStyles.cardTitle),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: AppTextStyles.smallText),
-                ],
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: AppColors.primaryBlue, size: 22),
               ),
-            ),
-            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-          ],
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTextStyles.cardTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: AppTextStyles.smallText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textTertiary,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildLogoutCard() {
-    return GestureDetector(
-      onTap: _logout,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.chipRedBg,
-          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.logout, color: AppColors.dangerRed),
-            const SizedBox(width: 8),
-            Text(
-              'Keluar',
-              style: AppTextStyles.cardTitle.copyWith(
-                color: AppColors.dangerRed,
-              ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: _logout,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: AppColors.chipRedBg,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.dangerRed.withValues(alpha: 0.15),
+              width: 1,
             ),
-          ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.logout_rounded,
+                color: AppColors.dangerRed,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Keluar',
+                style: AppTextStyles.buttonText.copyWith(
+                  color: AppColors.dangerRed,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

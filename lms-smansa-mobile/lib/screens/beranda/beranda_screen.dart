@@ -7,6 +7,7 @@ import '../../core/api/api_repository.dart';
 import '../../widgets/search_bar_widget.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/status_chip.dart';
+import '../../widgets/responsive_container.dart';
 import '../../app/routes.dart';
 import '../../app/main_shell_controller.dart';
 import '../../app/notification_badge_controller.dart';
@@ -139,36 +140,47 @@ class _BerandaScreenState extends State<BerandaScreen> {
             children: [
               _buildCustomHeader(context),
               Positioned(
-                bottom: -24,
+                bottom: -22,
                 left: 0,
                 right: 0,
-                child: SearchBarWidget(hint: 'Cari Informasi...', onTap: () {}),
+                child: SearchBarWidget(
+                  hint: 'Cari Informasi...',
+                  onTap: () {},
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 44),
-          _buildGridMenu(context),
-          const SizedBox(height: AppConstants.sectionSpacing),
-          SectionHeader(
-            title: 'Berita Terbaru',
-            actionLabel: 'Lihat Semua',
-            onActionTap: () {
-              // Pindah ke tab Berita di MainShell (index 2)
-              MainShellController.instance.switchToTab(2);
-            },
+          // Spacer yang cukup supaya search bar tidak overlap
+          // dengan menu grid di bawahnya.
+          const SizedBox(height: 50),
+          ResponsivePadding(
+            child: _buildGridMenu(context),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.sectionSpacing),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SectionHeader(
+              title: 'Berita Terbaru',
+              actionLabel: 'Lihat semua',
+              onActionTap: () {
+                // Pindah ke tab Berita di MainShell (index 2)
+                MainShellController.instance.switchToTab(2);
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
           _buildPengumumanHorizontal(),
           const SizedBox(height: AppConstants.sectionSpacing),
-          SectionHeader(
-            title: 'Materi Terbaru',
-            actionLabel: 'Lihat Semua',
-            onActionTap: () {
-              // Buka halaman Materi sebagai halaman penuh dengan back button
-              Navigator.pushNamed(context, AppRoutes.materi);
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SectionHeader(
+              title: 'Materi Terbaru',
+              actionLabel: 'Lihat Semua',
+              onActionTap: () {
+                Navigator.pushNamed(context, AppRoutes.materi);
+              },
+            ),
           ),
-          const SizedBox(height: 16),
           _buildMateriTerbaru(),
           const SizedBox(height: 30),
         ],
@@ -177,117 +189,193 @@ class _BerandaScreenState extends State<BerandaScreen> {
   }
 
   Widget _buildCustomHeader(BuildContext context) {
+    // Pakai SafeArea untuk hindarin overlap dengan status bar / notch.
     return ClipPath(
       clipper: _WavyClipper(),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(20, 48, 20, 60),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          MediaQuery.of(context).padding.top + 24,
+          20,
+          80,
+        ),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.primaryBlueDark, AppColors.primaryBlue],
+            colors: [
+              Color(0xFF1D4ED8),
+              Color(0xFF2563EB),
+              Color(0xFF3B82F6),
+            ],
+            stops: [0.0, 0.55, 1.0],
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // Subtle glass overlay (soft white wash top → bottom-right)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.10),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Decorative soft blobs
+            Positioned(
+              top: -50,
+              right: -50,
+              child: Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.06),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 80,
+              right: 80,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.04),
+                ),
+              ),
+            ),
+            // Main content
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      padding: const EdgeInsets.all(4),
-                      child: Image.asset('assets/images/logo_smansa.png'),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          AppConstants.schoolName,
-                          style: AppTextStyles.bodyText.copyWith(
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.10),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
+                          padding: const EdgeInsets.all(5),
+                          child: Image.asset('assets/images/logo_smansa.png'),
                         ),
-                        Text(
-                          AppConstants.tagline,
-                          style: AppTextStyles.smallText.copyWith(
-                            color: Colors.white70,
-                            fontSize: 10,
-                          ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppConstants.schoolName,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              AppConstants.tagline,
+                              style: AppTextStyles.caption.copyWith(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
                         ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        // Tombol notifikasi + badge merah
+                        _buildNotificationButton(context),
+                        const SizedBox(width: 8),
+                        // Tombol profile avatar
+                        _buildProfileButton(context),
                       ],
                     ),
                   ],
                 ),
+                const SizedBox(height: 28),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Tombol notifikasi + badge merah
-                    _buildNotificationButton(context),
-                    const SizedBox(width: 8),
-                    // Tombol profile avatar
-                    _buildProfileButton(context),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.accentYellow,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _namaKelas,
-                          style: AppTextStyles.smallText.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.accentYellow,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              _namaKelas,
+                              style: AppTextStyles.caption.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                           ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Halo, $_nama',
+                            style: AppTextStyles.headerTitle.copyWith(
+                              fontSize: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Semangat belajar hari ini!',
+                            style: AppTextStyles.headerSubtitle,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          width: 1,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Text('Halo, $_nama', style: AppTextStyles.headerTitle),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Semangat belajar hari ini!',
-                        style: AppTextStyles.headerSubtitle,
+                      child: const Icon(
+                        Icons.waving_hand_rounded,
+                        size: 40,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 80,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.emoji_people,
-                    size: 60,
-                    color: Colors.white54,
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -382,84 +470,122 @@ class _BerandaScreenState extends State<BerandaScreen> {
   Widget _buildGridMenu(BuildContext context) {
     final menus = [
       {
-        'icon': Icons.calendar_month,
+        'icon': Icons.calendar_month_rounded,
         'label': 'Kalender\nAkademik',
         'route': AppRoutes.kalender,
+        'color': AppColors.primaryBlue,
       },
       {
-        'icon': Icons.qr_code_scanner,
+        'icon': Icons.qr_code_scanner_rounded,
         'label': 'Pemindai\nKartu',
         'route': AppRoutes.pemindai,
+        'color': const Color(0xFF7C3AED),
       },
       {
-        'icon': Icons.history_edu,
+        'icon': Icons.history_edu_rounded,
         'label': 'Riwayat\nAkademik',
         'route': AppRoutes.riwayat,
+        'color': const Color(0xFF059669),
       },
-      {'icon': Icons.assignment, 'label': 'Tugas', 'route': AppRoutes.tugas},
-      {'icon': Icons.quiz, 'label': 'Ujian', 'route': AppRoutes.ujian},
       {
-        'icon': Icons.rocket_launch,
+        'icon': Icons.assignment_rounded,
+        'label': 'Tugas',
+        'route': AppRoutes.tugas,
+        'color': const Color(0xFFD97706),
+      },
+      {
+        'icon': Icons.quiz_rounded,
+        'label': 'Ujian',
+        'route': AppRoutes.ujian,
+        'color': AppColors.dangerRed,
+      },
+      {
+        'icon': Icons.rocket_launch_rounded,
         'label': 'SMANSAGo',
         'route': AppRoutes.smansago,
+        'color': const Color(0xFFDB2777),
       },
       {
-        'icon': Icons.schedule,
+        'icon': Icons.schedule_rounded,
         'label': 'Jadwal\nSiswa',
         'route': AppRoutes.jadwal,
+        'color': AppColors.primaryBlue,
       },
-      {'icon': Icons.folder_open, 'label': 'Materi', 'route': AppRoutes.materi},
+      {
+        'icon': Icons.folder_open_rounded,
+        'label': 'Materi',
+        'route': AppRoutes.materi,
+        'color': const Color(0xFF14B8A6),
+      },
     ];
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final itemWidth = ((screenWidth - 40 - 60) / 4).clamp(50.0, 90.0);
+    // Hitung lebar item berdasarkan lebar layar.
+    // Mobile: 4 kolom, tablet: 6-8 kolom. Spacing adaptif.
+    final size = AppConstants.getScreenSize(screenWidth);
+    final int cols = switch (size) {
+      ScreenSize.small => 4,
+      ScreenSize.medium => 4,
+      ScreenSize.large => 5,
+      ScreenSize.extraLarge => 6,
+    };
+    final double hPadding = AppConstants.responsivePadding(screenWidth);
+    final double spacing = screenWidth < AppConstants.mobileMedium ? 12 : 20;
+    final double totalSpacing = spacing * (cols - 1);
+    final double itemWidth =
+        ((screenWidth - hPadding * 2 - totalSpacing) / cols).clamp(60.0, 100.0);
+    final double iconSize = size == ScreenSize.small ? 46 : 54;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Wrap(
-        spacing: 20,
-        runSpacing: 20,
-        alignment: WrapAlignment.spaceBetween,
-        children: menus.map((menu) {
-          return GestureDetector(
-            onTap: () {
-              if (menu['route'] != null) {
-                Navigator.pushNamed(context, menu['route'] as String);
-              }
-            },
-            child: SizedBox(
-              width: itemWidth,
-              child: Column(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: AppColors.chipBlueBg,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      menu['icon'] as IconData,
-                      color: AppColors.primaryBlue,
-                      size: 24,
+    return Wrap(
+      spacing: spacing,
+      runSpacing: spacing,
+      alignment: WrapAlignment.start,
+      children: menus.map((menu) {
+        final accent = menu['color'] as Color;
+        return GestureDetector(
+          onTap: () {
+            if (menu['route'] != null) {
+              Navigator.pushNamed(context, menu['route'] as String);
+            }
+          },
+          child: SizedBox(
+            width: itemWidth,
+            child: Column(
+              children: [
+                Container(
+                  width: iconSize,
+                  height: iconSize,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: accent.withValues(alpha: 0.18),
+                      width: 1,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    menu['label'] as String,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.smallText.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                    ),
+                  child: Icon(
+                    menu['icon'] as IconData,
+                    color: accent,
+                    size: size == ScreenSize.small ? 22 : 24,
                   ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  menu['label'] as String,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.smallText.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
+                    height: 1.25,
+                  ),
+                ),
                 ],
               ),
             ),
           );
         }).toList(),
-      ),
     );
   }
 
@@ -475,7 +601,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
     }
 
     return SizedBox(
-      height: 160,
+      height: 168,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -489,16 +615,21 @@ class _BerandaScreenState extends State<BerandaScreen> {
 
           return Container(
             width: 280,
-            margin: const EdgeInsets.only(right: 16),
+            margin: const EdgeInsets.only(right: 14),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.borderSubtle,
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.cardShadow,
-                  blurRadius: 10,
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
+                  spreadRadius: -2,
                 ),
               ],
             ),
@@ -515,11 +646,11 @@ class _BerandaScreenState extends State<BerandaScreen> {
                     if (createdAt != null)
                       Text(
                         DateFormat('dd MMM').format(createdAt),
-                        style: AppTextStyles.smallText,
+                        style: AppTextStyles.caption,
                       ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Text(
                   berita['judul'] as String,
                   style: AppTextStyles.cardTitle,
@@ -527,13 +658,23 @@ class _BerandaScreenState extends State<BerandaScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),
-                Text(
-                  'Baca selengkapnya',
-                  style: AppTextStyles.bodyText.copyWith(
-                    color: AppColors.primaryBlue,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Baca selengkapnya',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    const Icon(
+                      Icons.arrow_forward,
+                      size: 14,
+                      color: AppColors.primaryBlue,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -561,33 +702,36 @@ class _BerandaScreenState extends State<BerandaScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: const Border(
-                left: BorderSide(color: AppColors.primaryBlue, width: 4),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.borderSubtle,
+                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.cardShadow,
-                  blurRadius: 8,
+                  blurRadius: 10,
                   offset: const Offset(0, 2),
+                  spreadRadius: -2,
                 ),
               ],
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.chipBlueBg,
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.primaryBlueTint,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.description,
+                    Icons.description_rounded,
                     color: AppColors.primaryBlue,
                     size: 22,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,6 +749,11 @@ class _BerandaScreenState extends State<BerandaScreen> {
                       ),
                     ],
                   ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.textTertiary,
+                  size: 20,
                 ),
               ],
             ),

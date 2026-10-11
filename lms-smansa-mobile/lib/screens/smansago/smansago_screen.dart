@@ -19,6 +19,7 @@ class SmansagoScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(
@@ -28,15 +29,6 @@ class SmansagoScreen extends StatelessWidget {
             fontSize: 18,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -53,7 +45,9 @@ class SmansagoScreen extends StatelessWidget {
                   bottom: -24,
                   left: 0,
                   right: 0,
-                  child: const SearchBarWidget(hint: 'Cari tautan atau portal...'),
+                  child: const SearchBarWidget(
+                    hint: 'Cari tautan atau portal...',
+                  ),
                 ),
               ],
             ),
@@ -73,8 +67,8 @@ class SmansagoScreen extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 14,
+                  mainAxisSpacing: 14,
                   childAspectRatio: 1.1,
                 ),
                 itemCount: MockSmansago.portals.length,
@@ -116,38 +110,59 @@ class SmansagoScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 4),
             blurRadius: 12,
+            spreadRadius: -2,
           ),
         ],
-        border: const Border(left: BorderSide(color: AppColors.leftBorderBlue, width: AppConstants.leftBorderWidth)),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: AppColors.chipBlueBg,
+              color: AppColors.primaryBlueTint,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.menu_book, color: AppColors.primaryBlue, size: 28),
+            child: const Icon(
+              Icons.menu_book_rounded,
+              color: AppColors.primaryBlue,
+              size: 24,
+            ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Portal E-Learning', style: AppTextStyles.cardTitle),
                 const SizedBox(height: 4),
-                Text('Akses materi dan tugas online', style: AppTextStyles.smallText),
+                Text(
+                  'Akses materi dan tugas online',
+                  style: AppTextStyles.smallText,
+                ),
               ],
             ),
           ),
-          const Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary, size: 16),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: AppColors.textSecondary,
+              size: 14,
+            ),
+          ),
         ],
       ),
     );
@@ -156,11 +171,16 @@ class SmansagoScreen extends StatelessWidget {
   Widget _buildGridPortalCard(PortalItem portal) {
     IconData getIcon(String name) {
       switch (name) {
-        case 'assignment': return Icons.assignment;
-        case 'menu_book': return Icons.menu_book;
-        case 'sports_basketball': return Icons.sports_basketball;
-        case 'campaign': return Icons.campaign;
-        default: return Icons.widgets;
+        case 'assignment':
+          return Icons.assignment_rounded;
+        case 'menu_book':
+          return Icons.menu_book_rounded;
+        case 'sports_basketball':
+          return Icons.sports_basketball_rounded;
+        case 'campaign':
+          return Icons.campaign_rounded;
+        default:
+          return Icons.widgets_rounded;
       }
     }
 
@@ -168,12 +188,14 @@ class SmansagoScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 2),
             blurRadius: 8,
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -185,23 +207,29 @@ class SmansagoScreen extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: AppColors.primaryBlueTint,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(getIcon(portal.ikonName), color: AppColors.primaryBlue),
+                child: Icon(
+                  getIcon(portal.ikonName),
+                  color: AppColors.primaryBlue,
+                  size: 22,
+                ),
               ),
               if (portal.hasNotification)
                 Positioned(
                   top: -2,
                   right: -2,
                   child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: const BoxDecoration(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
                       color: AppColors.dangerRed,
                       shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
                   ),
                 ),
@@ -210,7 +238,12 @@ class SmansagoScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Text(portal.judul, style: AppTextStyles.cardTitle),
           const SizedBox(height: 4),
-          Text(portal.deskripsi, style: AppTextStyles.smallText, maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(
+            portal.deskripsi,
+            style: AppTextStyles.smallText,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -219,31 +252,49 @@ class SmansagoScreen extends StatelessWidget {
   Widget _buildSocialCard(Map<String, String> social) {
     IconData getIcon(String name) {
       switch (name) {
-        case 'camera_alt': return Icons.camera_alt;
-        case 'play_circle': return Icons.play_circle;
-        case 'language': return Icons.language;
-        default: return Icons.link;
+        case 'camera_alt':
+          return Icons.camera_alt_outlined;
+        case 'play_circle':
+          return Icons.play_circle_outline_rounded;
+        case 'language':
+          return Icons.language_rounded;
+        default:
+          return Icons.link_rounded;
       }
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 2),
             blurRadius: 8,
+            spreadRadius: -2,
           ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(getIcon(social['icon']!), color: AppColors.textSecondary),
-          const SizedBox(height: 8),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              getIcon(social['icon']!),
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(height: 10),
           Text(social['nama']!, style: AppTextStyles.smallText),
         ],
       ),

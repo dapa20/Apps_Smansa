@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
 
 /// A reusable blue curved header used across many screens.
 /// Displays a title, optional subtitle, and optional trailing widgets.
+///
+/// Style: modern minimal dengan gradient halus (deep blue → mid blue → light),
+/// padding adaptif dengan [SafeArea] untuk notch/status bar, dan opsional
+/// glass overlay + decorative blobs untuk efek premium.
+///
+/// Tinggi [height] adalah tinggi minimum (ekspansi mengikuti konten).
 class BlueHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -28,37 +33,86 @@ class BlueHeader extends StatelessWidget {
       clipper: _WavyClipper(),
       child: Container(
         width: double.infinity,
-        constraints: BoxConstraints(minHeight: height),
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 60),
+        constraints: BoxConstraints(
+          minHeight: height + MediaQuery.of(context).padding.top,
+        ),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.primaryBlueDark, AppColors.primaryBlue],
+            colors: [
+              Color(0xFF1D4ED8), // primaryBlueDark
+              Color(0xFF2563EB), // primaryBlue
+              Color(0xFF3B82F6), // lighter blue
+            ],
+            stops: [0.0, 0.55, 1.0],
           ),
         ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (leading != null || trailing != null)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
+          children: [
+            // Soft glass overlay (subtle white wash) untuk efek premium
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.10),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Decorative blob (lingkaran samar di pojok)
+            Positioned(
+              top: -40,
+              right: -40,
+              child: Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.06),
+                ),
+              ),
+            ),
+            // Konten utama: pakai SafeArea untuk hindarin overlap notch.
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 56),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    leading ?? const SizedBox.shrink(),
-                    trailing ?? const SizedBox.shrink(),
+                    if (leading != null || trailing != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          leading ?? const SizedBox.shrink(),
+                          trailing ?? const SizedBox.shrink(),
+                        ],
+                      ),
+                    if (leading != null || trailing != null)
+                      const SizedBox(height: 14),
+                    Text(title, style: AppTextStyles.headerTitle),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        subtitle!,
+                        style: AppTextStyles.headerSubtitle,
+                      ),
+                    ],
+                    if (extraContent != null) ...extraContent!,
                   ],
                 ),
-              if (leading != null || trailing != null) const SizedBox(height: 12),
-              Text(title, style: AppTextStyles.headerTitle),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(subtitle!, style: AppTextStyles.headerSubtitle),
-              ],
-              if (extraContent != null) ...extraContent!,
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

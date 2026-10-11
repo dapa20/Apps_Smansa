@@ -68,6 +68,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         title: Text(
           AppConstants.appName,
@@ -76,15 +77,6 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             fontSize: 18,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
-          ),
-        ],
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       body: SingleChildScrollView(
@@ -111,7 +103,10 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Pilih Semester', style: AppTextStyles.sectionTitle),
+              child: Text(
+                'Pilih Semester',
+                style: AppTextStyles.sectionTitle,
+              ),
             ),
             const SizedBox(height: 12),
             _buildSemesterSelector(),
@@ -144,12 +139,14 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 4),
-            blurRadius: 12,
+            blurRadius: 14,
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -159,8 +156,13 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Rata-rata Semester', style: AppTextStyles.bodySecondary),
-              const SizedBox(height: 4),
+              Text(
+                'Rata-rata Semester',
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 6),
               Text(
                 (_data?['rata_rata'] ?? '0').toString(),
                 style: AppTextStyles.bigNumber,
@@ -173,13 +175,14 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             ],
           ),
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: AppColors.chipBlueBg,
+              color: AppColors.primaryBlueTint,
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.trending_up,
+              Icons.trending_up_rounded,
               color: AppColors.primaryBlue,
               size: 28,
             ),
@@ -213,19 +216,20 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         isActive ? _semesterIndex : _semesters.indexOf(text.split(' ').last),
       ),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: isActive ? AppColors.primaryBlue : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: isActive ? AppColors.primaryBlue : AppColors.divider,
+            color: isActive ? AppColors.primaryBlue : AppColors.borderSubtle,
           ),
         ),
         child: Text(
           text,
-          style: AppTextStyles.bodyText.copyWith(
+          style: AppTextStyles.bodyMedium.copyWith(
             color: isActive ? Colors.white : AppColors.textPrimary,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+            fontSize: 13,
           ),
         ),
       ),
@@ -236,14 +240,31 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     if (_loading) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: AppColors.primaryBlue,
+          ),
+        ),
       );
     }
 
     if (_error != null) {
       return Column(
         children: [
-          const Icon(Icons.cloud_off, size: 48, color: AppColors.textSecondary),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.cloud_off_rounded,
+              size: 32,
+              color: AppColors.textSecondary,
+            ),
+          ),
           const SizedBox(height: 12),
           Text(
             _error!,
@@ -263,20 +284,16 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 2),
             blurRadius: 8,
+            spreadRadius: -2,
           ),
         ],
-        border: const Border(
-          left: BorderSide(
-            color: AppColors.accentYellow,
-            width: AppConstants.leftBorderWidth,
-          ),
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,10 +306,13 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 style: AppTextStyles.cardTitle,
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.chipYellowBg,
-                  borderRadius: BorderRadius.circular(AppConstants.chipRadius),
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   'IPS',
@@ -378,6 +398,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                   color: rataRata >= target
                       ? AppColors.chipGreenText
                       : AppColors.chipRedText,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -433,15 +454,17 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 2),
             blurRadius: 8,
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -455,15 +478,16 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 height: 48,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppColors.chipBlueBg,
+                  color: AppColors.primaryBlueTint,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Σ',
-                  style: TextStyle(fontSize: 24, color: AppColors.primaryBlue),
+                child: const Icon(
+                  Icons.functions_rounded,
+                  color: AppColors.primaryBlue,
+                  size: 24,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,15 +509,29 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Nilai Akhir', style: AppTextStyles.bodyText),
+              Text('Nilai Akhir', style: AppTextStyles.bodyMedium),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
                     nilaiAkhir,
                     style: AppTextStyles.bigNumber.copyWith(fontSize: 24),
                   ),
                   const SizedBox(width: 12),
-                  Text(hurufMutu, style: AppTextStyles.letterGrade),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.chipYellowBg,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      hurufMutu,
+                      style: AppTextStyles.letterGrade.copyWith(fontSize: 14),
+                    ),
+                  ),
                 ],
               ),
             ],

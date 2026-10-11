@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
@@ -49,7 +50,10 @@ class _BeritaScreenState extends State<BeritaScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const BlueHeader(title: 'Berita & Pengumuman'),
+        const BlueHeader(
+          title: 'Berita & Pengumuman',
+          subtitle: 'Informasi terkini dari sekolah',
+        ),
         Expanded(child: _buildBody()),
       ],
     );
@@ -57,7 +61,12 @@ class _BeritaScreenState extends State<BeritaScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: AppColors.primaryBlue,
+        ),
+      );
     }
 
     if (_error != null) {
@@ -67,18 +76,26 @@ class _BeritaScreenState extends State<BeritaScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.cloud_off,
-                size: 48,
-                color: AppColors.textSecondary,
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.cloud_off_rounded,
+                  size: 36,
+                  color: AppColors.textSecondary,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodySecondary,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               ElevatedButton(onPressed: _load, child: const Text('Coba Lagi')),
             ],
           ),
@@ -88,13 +105,42 @@ class _BeritaScreenState extends State<BeritaScreen> {
 
     final list = _pengumuman ?? [];
     if (list.isEmpty) {
-      return const Center(child: Text('Belum ada pengumuman.'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.newspaper_rounded,
+                size: 40,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text('Belum ada berita', style: AppTextStyles.cardTitle),
+            const SizedBox(height: 4),
+            Text(
+              'Berita terbaru akan muncul di sini',
+              style: AppTextStyles.smallText,
+            ),
+          ],
+        ),
+      );
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.responsivePadding(MediaQuery.of(context).size.width),
+        vertical: 20,
+      ),
       itemCount: list.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      separatorBuilder: (context, index) => const SizedBox(height: 14),
       itemBuilder: (context, index) => _buildBeritaCard(list[index]),
     );
   }
@@ -112,7 +158,7 @@ class _BeritaScreenState extends State<BeritaScreen> {
       case 'pengumuman':
       case 'penting':
         categoryColor = AppColors.accentYellow;
-        statusType = 'menunggu';
+        statusType = 'penting';
         break;
       case 'prestasi':
         categoryColor = AppColors.chipGreenText;
@@ -130,12 +176,14 @@ class _BeritaScreenState extends State<BeritaScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             blurRadius: 12,
             offset: const Offset(0, 4),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -147,13 +195,13 @@ class _BeritaScreenState extends State<BeritaScreen> {
             decoration: BoxDecoration(
               color: categoryColor,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -164,20 +212,20 @@ class _BeritaScreenState extends State<BeritaScreen> {
                     if (createdAt != null)
                       Text(
                         DateFormat('dd MMM yyyy').format(createdAt),
-                        style: AppTextStyles.smallText,
+                        style: AppTextStyles.caption,
                       ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
                   pengumuman['judul'] ?? '-',
-                  style: AppTextStyles.cardTitle,
+                  style: AppTextStyles.cardTitle.copyWith(fontSize: 16),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   pengumuman['isi'] ?? '',
                   style: AppTextStyles.bodySecondary,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],

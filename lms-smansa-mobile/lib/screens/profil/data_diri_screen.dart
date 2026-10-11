@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../core/api/auth_service.dart';
 import '../../widgets/back_button_overlay.dart';
+import '../../widgets/responsive_container.dart';
 
 class DataDiriScreen extends StatefulWidget {
   const DataDiriScreen({super.key});
@@ -25,7 +25,7 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
   @override
   void initState() {
     super.initState();
-    // Pakai cache siswa dulu (supaya Hasil riwayat baru tampil cepat),
+    // Pakai cache siswa dulu (supaya profil tampil cepat),
     // lalu refresh dari API di background.
     _data = AuthService.instance.cachedSiswa == null
         ? null
@@ -79,23 +79,31 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _loading && _siswa == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primaryBlue,
+              ),
+            )
           : _error != null && _siswa == null
               ? _buildErrorState()
               : RefreshIndicator(
                   onRefresh: _load,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(AppConstants.screenPadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildProfileCard(),
-                        const SizedBox(height: 16),
-                        _buildIdentityCard(),
-                        const SizedBox(height: 16),
-                        _buildKehadiranCard(),
-                      ],
+                    child: ResponsivePadding(
+                      verticalPadding:
+                          const EdgeInsets.symmetric(vertical: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildProfileCard(),
+                          const SizedBox(height: 16),
+                          _buildIdentityCard(),
+                          const SizedBox(height: 16),
+                          _buildKehadiranCard(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -109,14 +117,26 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off, size: 48, color: AppColors.textSecondary),
-            const SizedBox(height: 12),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.cloud_off_rounded,
+                size: 36,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodySecondary,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _load,
               child: const Text('Coba Lagi'),
@@ -136,70 +156,89 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primaryBlueDark, AppColors.primaryBlue],
+          colors: [
+            Color(0xFF1D4ED8),
+            Color(0xFF2563EB),
+            Color(0xFF3B82F6),
+          ],
+          stops: [0.0, 0.55, 1.0],
         ),
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 4),
-            blurRadius: 12,
+            color: AppColors.primaryBlue.withValues(alpha: 0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+            spreadRadius: -4,
           ),
         ],
       ),
       child: Column(
         children: [
           Container(
-            width: 80,
-            height: 80,
+            width: 84,
+            height: 84,
             decoration: BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
+              border: Border.all(color: Colors.white, width: 4),
             ),
-            child: const Icon(Icons.person, size: 40, color: AppColors.primaryBlue),
+            child: const Icon(
+              Icons.person_rounded,
+              size: 44,
+              color: AppColors.primaryBlue,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             nama,
             style: AppTextStyles.headerTitle.copyWith(fontSize: 20),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
               color: AppColors.accentYellow,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
               kelas.toString().toUpperCase(),
               style: AppTextStyles.chipText.copyWith(color: Colors.white),
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 16,
+            runSpacing: 4,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Icon(
-                Icons.badge_outlined,
-                size: 14,
-                color: Colors.white70,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.badge_outlined,
+                    size: 14,
+                    color: Colors.white70,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'NIS: $nis',
+                    style: AppTextStyles.caption.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 4),
-              Text(
-                'NIS: $nis',
-                style: AppTextStyles.smallText.copyWith(color: Colors.white70),
-              ),
-              const SizedBox(width: 12),
               Text(
                 'NISN: $nisn',
-                style: AppTextStyles.smallText.copyWith(color: Colors.white70),
+                style: AppTextStyles.caption.copyWith(color: Colors.white70),
               ),
             ],
           ),
@@ -214,12 +253,14 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            offset: const Offset(0, 2),
             blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -229,15 +270,16 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.chipBlueBg,
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.person_outline,
+                  Icons.person_outline_rounded,
                   color: AppColors.primaryBlue,
-                  size: 20,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
@@ -248,7 +290,10 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
           const Divider(color: AppColors.divider, height: 1),
           _buildDataRow('NIS', siswa['nis']?.toString() ?? '-'),
           _buildDataRow('NISN', siswa['nisn']?.toString() ?? '-'),
-          _buildDataRow('Nama Lengkap', siswa['nama_lengkap']?.toString() ?? '-'),
+          _buildDataRow(
+            'Nama Lengkap',
+            siswa['nama_lengkap']?.toString() ?? '-',
+          ),
           _buildDataRow(
             'Jenis Kelamin',
             _jenisKelamin(siswa['jenis_kelamin'] as String?),
@@ -256,8 +301,14 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
           _buildDataRow('Kelas', siswa['nama_kelas']?.toString() ?? '-'),
           _buildDataRow('Tingkat', siswa['tingkat']?.toString() ?? '-'),
           _buildDataRow('Program', siswa['program']?.toString() ?? '-'),
-          _buildDataRow('Tahun Ajaran', siswa['tahun_ajaran']?.toString() ?? '-'),
-          _buildDataRow('Wali Kelas', siswa['wali_kelas']?.toString() ?? '-'),
+          _buildDataRow(
+            'Tahun Ajaran',
+            siswa['tahun_ajaran']?.toString() ?? '-',
+          ),
+          _buildDataRow(
+            'Wali Kelas',
+            siswa['wali_kelas']?.toString() ?? '-',
+          ),
           _buildDataRow(
             'Status',
             (siswa['status']?.toString() ?? '-').toUpperCase(),
@@ -280,12 +331,14 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            offset: const Offset(0, 2),
             blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -295,15 +348,16 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.chipGreenBg,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.fact_check,
+                  Icons.fact_check_rounded,
                   color: AppColors.chipGreenText,
-                  size: 20,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
@@ -312,6 +366,7 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
           ),
           const SizedBox(height: 16),
           const Divider(color: AppColors.divider, height: 1),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -321,36 +376,36 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
               _buildStat('Alpa', '$alpa', AppColors.chipRedText),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: AppColors.chipBlueBg,
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.primaryBlueTint,
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Persentase Kehadiran',
-                  style: AppTextStyles.bodyText.copyWith(
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.primaryBlue,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '$persen%',
                   style: AppTextStyles.cardTitle.copyWith(
                     color: AppColors.primaryBlue,
+                    fontSize: 18,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             'Total $total pertemuan tercatat',
-            style: AppTextStyles.smallText,
+            style: AppTextStyles.caption,
             textAlign: TextAlign.center,
           ),
         ],
@@ -390,7 +445,9 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
             flex: 6,
             child: Text(
               value,
-              style: AppTextStyles.bodyText.copyWith(fontWeight: FontWeight.w600),
+              style: AppTextStyles.bodyText.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

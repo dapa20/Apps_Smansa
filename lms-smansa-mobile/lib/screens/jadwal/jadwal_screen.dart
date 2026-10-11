@@ -75,18 +75,16 @@ class _JadwalScreenState extends State<JadwalScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        title: Text(AppConstants.appName, style: AppTextStyles.cardTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
+        title: Text(
+          AppConstants.appName,
+          style: AppTextStyles.cardTitle.copyWith(
+            color: AppColors.primaryBlue,
+            fontSize: 18,
           ),
-        ],
+        ),
       ),
       body: Column(
         children: [
@@ -105,7 +103,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
   Widget _buildTabs() {
     return Container(
       color: Colors.white,
-      height: 60,
+      height: 64,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -120,31 +118,33 @@ class _JadwalScreenState extends State<JadwalScreen> {
                 _selectedHari = hari;
               });
             },
-            child: Container(
-              margin: const EdgeInsets.only(right: 12, top: 12, bottom: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.chipBlueBg : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-                border: isSelected
-                    ? Border.all(
-                        color: AppColors.primaryBlue.withValues(alpha: 0.3),
-                      )
-                    : Border.all(color: Colors.transparent),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 4,
+                vertical: 14,
               ),
-              child: Center(
-                child: Text(
-                  hari,
-                  style: AppTextStyles.bodyText.copyWith(
-                    color: isSelected
-                        ? AppColors.primaryBlue
-                        : AppColors.textSecondary,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    decoration: isSelected
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-                    decorationColor: AppColors.primaryBlue,
-                  ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primaryBlue : Colors.transparent,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.primaryBlue
+                      : AppColors.borderSubtle,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                hari,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isSelected
+                      ? Colors.white
+                      : AppColors.textSecondary,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ),
@@ -156,7 +156,12 @@ class _JadwalScreenState extends State<JadwalScreen> {
 
   Widget _buildTimeline() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: AppColors.primaryBlue,
+        ),
+      );
     }
 
     if (_error != null) {
@@ -166,12 +171,20 @@ class _JadwalScreenState extends State<JadwalScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.cloud_off,
-                size: 48,
-                color: AppColors.textSecondary,
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.cloud_off_rounded,
+                  size: 36,
+                  color: AppColors.textSecondary,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
@@ -189,15 +202,34 @@ class _JadwalScreenState extends State<JadwalScreen> {
 
     if (jadwalList.isEmpty) {
       return Center(
-        child: Text(
-          'Tidak ada jadwal $_selectedHari',
-          style: AppTextStyles.bodySecondary,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.event_busy_rounded,
+                size: 40,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Tidak ada jadwal $_selectedHari',
+              style: AppTextStyles.bodySecondary,
+            ),
+          ],
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       itemCount: jadwalList.length,
       itemBuilder: (context, index) {
         final jadwal = jadwalList[index];
@@ -213,8 +245,8 @@ class _JadwalScreenState extends State<JadwalScreen> {
                   children: [
                     Text(
                       jadwal['jam_mulai'] ?? '--:--',
-                      style: AppTextStyles.bodyText.copyWith(
-                        fontWeight: FontWeight.w600,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primaryBlue,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -223,16 +255,16 @@ class _JadwalScreenState extends State<JadwalScreen> {
                         width: 2,
                         color: isLast
                             ? Colors.transparent
-                            : AppColors.primaryBlue.withValues(alpha: 0.3),
+                            : AppColors.primaryBlue.withValues(alpha: 0.25),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: _buildScheduleCard(jadwal),
                 ),
               ),
@@ -248,15 +280,14 @@ class _JadwalScreenState extends State<JadwalScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: const Border(
-          left: BorderSide(color: AppColors.primaryBlue, width: 4),
-        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             blurRadius: 10,
             offset: const Offset(0, 4),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -274,21 +305,21 @@ class _JadwalScreenState extends State<JadwalScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    jadwal['jam_mulai'] ?? '',
-                    style: AppTextStyles.smallText.copyWith(
-                      color: AppColors.primaryBlue,
-                      fontWeight: FontWeight.w600,
-                    ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '${jadwal['jam_mulai'] ?? ''} – ${jadwal['jam_selesai'] ?? ''}',
+                  style: AppTextStyles.chipText.copyWith(
+                    color: AppColors.primaryBlue,
                   ),
-                  Text(
-                    jadwal['jam_selesai'] ?? '',
-                    style: AppTextStyles.smallText.copyWith(fontSize: 10),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -296,7 +327,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
           Row(
             children: [
               const Icon(
-                Icons.person_outline,
+                Icons.person_outline_rounded,
                 size: 16,
                 color: AppColors.textSecondary,
               ),

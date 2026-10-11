@@ -52,16 +52,21 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           (success ? 'Password berhasil diubah.' : 'Gagal mengubah password.');
 
       if (success) {
-        // Tampilkan dialog sukses & kosongkan field
         _passwordLamaC.clear();
         _passwordBaruC.clear();
         _passwordKonfirmasiC.clear();
         await showDialog<void>(
           context: context,
           builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             title: const Row(
               children: [
-                Icon(Icons.check_circle, color: AppColors.chipGreenText),
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.chipGreenText,
+                ),
                 SizedBox(width: 8),
                 Text('Berhasil'),
               ],
@@ -92,9 +97,10 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.error_outline, color: AppColors.dangerRed),
+            Icon(Icons.error_outline_rounded, color: AppColors.dangerRed),
             SizedBox(width: 8),
             Text('Gagal'),
           ],
@@ -114,6 +120,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Keluar'),
         content: const Text('Anda yakin ingin keluar dari akun ini?'),
         actions: [
@@ -178,11 +185,14 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
   }
 
   Widget _buildSectionTitle(String label) {
-    return Text(
-      label,
-      style: AppTextStyles.chipText.copyWith(
-        color: AppColors.textSecondary,
-        letterSpacing: 1.2,
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        label,
+        style: AppTextStyles.caption.copyWith(
+          color: AppColors.textSecondary,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
@@ -192,12 +202,14 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 2),
             blurRadius: 8,
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -207,15 +219,16 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.chipBlueBg,
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.lock_outline,
+                  Icons.lock_outline_rounded,
                   color: AppColors.primaryBlue,
-                  size: 20,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 12),
@@ -235,17 +248,15 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Text(
-            'Password Saat Ini',
-            style: AppTextStyles.bodyText.copyWith(fontWeight: FontWeight.w600),
-          ),
+          _buildLabel('Password Saat Ini'),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordLamaC,
             obscureText: _obscureLama,
+            style: AppTextStyles.bodyMedium,
             decoration: _buildInputDecoration(
               hint: 'Masukkan password lama',
-              icon: Icons.lock_outline,
+              icon: Icons.lock_outline_rounded,
               obscure: _obscureLama,
               onToggle: () => setState(() => _obscureLama = !_obscureLama),
             ),
@@ -253,17 +264,15 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
                 (v == null || v.isEmpty) ? 'Password lama wajib diisi' : null,
           ),
           const SizedBox(height: 16),
-          Text(
-            'Password Baru',
-            style: AppTextStyles.bodyText.copyWith(fontWeight: FontWeight.w600),
-          ),
+          _buildLabel('Password Baru'),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordBaruC,
             obscureText: _obscureBaru,
+            style: AppTextStyles.bodyMedium,
             decoration: _buildInputDecoration(
               hint: 'Minimal 6 karakter, huruf & angka',
-              icon: Icons.lock_reset,
+              icon: Icons.lock_reset_rounded,
               obscure: _obscureBaru,
               onToggle: () => setState(() => _obscureBaru = !_obscureBaru),
             ),
@@ -282,17 +291,15 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
             },
           ),
           const SizedBox(height: 16),
-          Text(
-            'Konfirmasi Password Baru',
-            style: AppTextStyles.bodyText.copyWith(fontWeight: FontWeight.w600),
-          ),
+          _buildLabel('Konfirmasi Password Baru'),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordKonfirmasiC,
             obscureText: _obscureKonfirmasi,
+            style: AppTextStyles.bodyMedium,
             decoration: _buildInputDecoration(
               hint: 'Ketik ulang password baru',
-              icon: Icons.lock_reset,
+              icon: Icons.lock_reset_rounded,
               obscure: _obscureKonfirmasi,
               onToggle: () => setState(
                   () => _obscureKonfirmasi = !_obscureKonfirmasi),
@@ -322,15 +329,8 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
                         strokeWidth: 2.5,
                       ),
                     )
-                  : const Icon(Icons.save, size: 18),
+                  : const Icon(Icons.save_rounded, size: 18),
               label: const Text('Simpan Password'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryBlue,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
             ),
           ),
         ],
@@ -338,30 +338,42 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     );
   }
 
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: AppTextStyles.caption.copyWith(
+        color: AppColors.textSecondary,
+        fontSize: 12,
+      ),
+    );
+  }
+
   Widget _buildAboutCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
         boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             offset: const Offset(0, 2),
             blurRadius: 8,
+            spreadRadius: -2,
           ),
         ],
       ),
       child: Column(
         children: [
           _buildInfoTile(
-            icon: Icons.school_outlined,
+            icon: Icons.school_rounded,
             title: AppConstants.schoolName,
             subtitle: AppConstants.tagline,
           ),
           const Divider(color: AppColors.divider, height: 24),
           _buildInfoRow('Versi Aplikasi', AppConstants.appVersion),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           _buildInfoRow(
             'Semester Aktif',
             AppConstants.currentSemester,
@@ -382,8 +394,8 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.chipBlueBg,
-            borderRadius: BorderRadius.circular(10),
+            color: AppColors.primaryBlueTint,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: AppColors.primaryBlue, size: 22),
         ),
@@ -392,7 +404,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: AppTextStyles.bodyText),
+              Text(title, style: AppTextStyles.bodyMedium),
               const SizedBox(height: 2),
               Text(
                 subtitle,
@@ -414,35 +426,48 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
         Text(label, style: AppTextStyles.bodySecondary),
         Text(
           value,
-          style: AppTextStyles.bodyText.copyWith(fontWeight: FontWeight.w600),
+          style: AppTextStyles.bodyMedium,
         ),
       ],
     );
   }
 
   Widget _buildLogoutCard() {
-    return GestureDetector(
-      onTap: _handleLogout,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.chipRedBg,
-          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.logout, color: AppColors.dangerRed),
-            SizedBox(width: 8),
-            Text(
-              'Keluar dari Akun',
-              style: TextStyle(
-                color: AppColors.dangerRed,
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: _handleLogout,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: AppColors.chipRedBg,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.dangerRed.withValues(alpha: 0.15),
+              width: 1,
             ),
-          ],
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.logout_rounded,
+                color: AppColors.dangerRed,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Keluar dari Akun',
+                style: TextStyle(
+                  color: AppColors.dangerRed,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  letterSpacing: 0.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -456,36 +481,38 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: AppTextStyles.bodySecondary.copyWith(fontSize: 14),
+      hintStyle: AppTextStyles.bodySecondary.copyWith(
+        color: AppColors.textTertiary,
+      ),
       prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
       suffixIcon: IconButton(
         icon: Icon(
-          obscure ? Icons.visibility_off : Icons.visibility,
+          obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
           color: AppColors.textSecondary,
           size: 20,
         ),
         onPressed: onToggle,
       ),
       filled: true,
-      fillColor: AppColors.background,
+      fillColor: AppColors.surfaceMuted,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 14,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.divider),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppColors.borderSubtle, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.6),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.dangerRed),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppColors.dangerRed, width: 1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.dangerRed, width: 1.6),
       ),
     );

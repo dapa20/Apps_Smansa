@@ -59,119 +59,174 @@ class _SplashScreenState extends State<SplashScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.primaryBlueDark, AppColors.primaryBlue],
+            colors: [
+              Color(0xFF1D4ED8),
+              Color(0xFF2563EB),
+              Color(0xFF3B82F6),
+            ],
+            stops: [0.0, 0.55, 1.0],
           ),
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-            child: Column(
-              children: [
-                const Spacer(flex: 2),
-
-                // ─── Logo ──────────────────────────────────────────
-                Container(
-                  width: 110,
-                  height: 110,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.18),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/logo_smansa.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.school,
-                          size: 56,
-                          color: AppColors.primaryBlue,
-                        );
-                      },
-                    ),
-                  ),
+        child: Stack(
+          children: [
+            // Decorative blobs
+            Positioned(
+              top: -60,
+              left: -60,
+              child: Container(
+                width: 220,
+                height: 220,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.06),
                 ),
-
-                const SizedBox(height: 32),
-
-                // ─── Nama Sekolah ──────────────────────────────────
-                Text(
-                  AppConstants.schoolName,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.headerTitle.copyWith(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // ─── Tagline ───────────────────────────────────────
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    AppConstants.tagline,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.smallText.copyWith(
-                      color: Colors.white,
-                      fontSize: 11,
-                      letterSpacing: 1.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-
-                const Spacer(flex: 3),
-
-                // ─── Loading ───────────────────────────────────────
-                const SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    strokeWidth: 3,
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                // ─── Versi ─────────────────────────────────────────
-                Text(
-                  'Loading ${AppConstants.appName}...',
-                  style: AppTextStyles.smallText.copyWith(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  AppConstants.appVersion,
-                  style: AppTextStyles.smallText.copyWith(
-                    color: Colors.white54,
-                    fontSize: 11,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-              ],
+              ),
             ),
-          ),
+            Positioned(
+              bottom: -80,
+              right: -80,
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.05),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 120,
+              right: 40,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.04),
+                ),
+              ),
+            ),
+
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 24,
+                ),
+                child: Column(
+                  children: [
+                    const Spacer(flex: 2),
+
+                    // ─── Logo ──────────────────────────────────────────
+                    Container(
+                      width: 116,
+                      height: 116,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.20),
+                            blurRadius: 28,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/logo_smansa.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.school,
+                              size: 60,
+                              color: AppColors.primaryBlue,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // ─── Nama Sekolah ──────────────────────────────────
+                    Text(
+                      AppConstants.schoolName,
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.headerTitle.copyWith(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // ─── Tagline ───────────────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        AppConstants.tagline,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white,
+                          fontSize: 11,
+                          letterSpacing: 1.6,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+
+                    const Spacer(flex: 3),
+
+                    // ─── Loading ───────────────────────────────────────
+                    const SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 3,
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    // ─── Versi ─────────────────────────────────────────
+                    Text(
+                      'Loading ${AppConstants.appName}...',
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      AppConstants.appVersion,
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

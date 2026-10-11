@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
@@ -7,7 +8,6 @@ import '../../data/mock_data.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/back_button_overlay.dart';
-import 'package:intl/intl.dart';
 
 class UjianScreen extends StatelessWidget {
   const UjianScreen({super.key});
@@ -19,6 +19,7 @@ class UjianScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(
@@ -28,15 +29,6 @@ class UjianScreen extends StatelessWidget {
             fontSize: 18,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Stack(
         children: [
@@ -73,12 +65,14 @@ class UjianScreen extends StatelessWidget {
       padding: const EdgeInsets.all(AppConstants.cardPadding),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -87,19 +81,43 @@ class UjianScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline, color: AppColors.primaryBlue),
-              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.info_outline_rounded,
+                  color: AppColors.primaryBlue,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
               Text('Instruksi Penting', style: AppTextStyles.cardTitle),
             ],
           ),
           const SizedBox(height: 12),
-          _buildInstruksiItem('1', 'Pastikan koneksi internet stabil sebelum memulai.'),
+          _buildInstruksiItem(
+            '1',
+            'Pastikan koneksi internet stabil sebelum memulai.',
+          ),
           const SizedBox(height: 4),
-          _buildInstruksiItem('2', 'Waktu akan terus berjalan meski aplikasi diminimize.'),
+          _buildInstruksiItem(
+            '2',
+            'Waktu akan terus berjalan meski aplikasi diminimize.',
+          ),
           const SizedBox(height: 4),
-          _buildInstruksiItem('3', 'Kerjakan dengan jujur. Sistem mendeteksi kecurangan.'),
+          _buildInstruksiItem(
+            '3',
+            'Kerjakan dengan jujur. Sistem mendeteksi kecurangan.',
+          ),
           const SizedBox(height: 4),
-          _buildInstruksiItem('4', 'Jangan lupa menekan tombol "Selesai" di akhir ujian.'),
+          _buildInstruksiItem(
+            '4',
+            'Jangan lupa menekan tombol "Selesai" di akhir ujian.',
+          ),
         ],
       ),
     );
@@ -109,7 +127,13 @@ class UjianScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('$number. ', style: AppTextStyles.bodySecondary),
+        Text(
+          '$number. ',
+          style: AppTextStyles.bodySecondary.copyWith(
+            color: AppColors.primaryBlue,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         Expanded(
           child: Text(text, style: AppTextStyles.bodySecondary),
         ),
@@ -120,93 +144,122 @@ class UjianScreen extends StatelessWidget {
   Widget _buildUjianBerlangsung() {
     final ujian = MockUjian.berlangsung.first;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.screenPadding),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.screenPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ujian Berlangsung (Wajib Segera)', style: AppTextStyles.sectionTitle),
+          Text(
+            'Ujian Berlangsung (Wajib Segera)',
+            style: AppTextStyles.sectionTitle,
+          ),
           const SizedBox(height: AppConstants.itemSpacing),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-              boxShadow: const [
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.borderSubtle,
+                width: 1,
+              ),
+              boxShadow: [
                 BoxShadow(
                   color: AppColors.cardShadow,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                  spreadRadius: -2,
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    left: BorderSide(color: AppColors.leftBorderBlue, width: AppConstants.leftBorderWidth),
-                  ),
-                ),
-                padding: const EdgeInsets.all(AppConstants.cardPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const StatusChip(label: 'SEDANG BERLANGSUNG', type: 'berlangsung', icon: Icons.timer),
-                        Text(
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.cardPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const StatusChip(
+                        label: 'SEDANG BERLANGSUNG',
+                        type: 'berlangsung',
+                        icon: Icons.timer_rounded,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.chipRedBg,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
                           'Sisa: ${ujian.sisaMenit} Menit',
-                          style: GoogleFonts.inter(color: AppColors.dangerRed, fontWeight: FontWeight.bold, fontSize: 13),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(ujian.judul, style: AppTextStyles.cardTitle),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.class_outlined, size: 16, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text('${ujian.namaKelas} • ${ujian.namaGuru}', style: AppTextStyles.smallText),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.format_list_bulleted, size: 16, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text('${ujian.jumlahSoal} Soal • ${ujian.tipeSoal}', style: AppTextStyles.smallText),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
+                          style: GoogleFonts.inter(
+                            color: AppColors.dangerRed,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
                           ),
-                          elevation: 0,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Mulai Ujian',
-                              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
-                            ),
-                            const SizedBox(width: 4),
-                            const Icon(Icons.arrow_forward, size: 18),
-                          ],
                         ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(ujian.judul, style: AppTextStyles.cardTitle),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.class_outlined,
+                        size: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${ujian.namaKelas} • ${ujian.namaGuru}',
+                        style: AppTextStyles.smallText,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.format_list_bulleted_rounded,
+                        size: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${ujian.jumlahSoal} Soal • ${ujian.tipeSoal}',
+                        style: AppTextStyles.smallText,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Mulai Ujian',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.arrow_forward_rounded, size: 18),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -217,7 +270,9 @@ class UjianScreen extends StatelessWidget {
 
   Widget _buildUjianMendatang() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.screenPadding),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.screenPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -232,30 +287,52 @@ class UjianScreen extends StatelessWidget {
               final ujian = MockUjian.mendatang[index];
               final formatter = DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
               return Container(
-                margin: const EdgeInsets.only(bottom: AppConstants.itemSpacing),
+                margin: const EdgeInsets.only(
+                  bottom: AppConstants.itemSpacing,
+                ),
                 padding: const EdgeInsets.all(AppConstants.cardPadding),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-                  border: Border.all(color: AppColors.divider),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.borderSubtle,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.cardShadow,
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                      spreadRadius: -2,
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(6),
+                        color: AppColors.surfaceMuted,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.event, size: 14, color: AppColors.textSecondary),
+                          const Icon(
+                            Icons.event_rounded,
+                            size: 14,
+                            color: AppColors.textSecondary,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             formatter.format(ujian.jadwal),
-                            style: AppTextStyles.chipText.copyWith(color: AppColors.textSecondary),
+                            style: AppTextStyles.chipText.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ],
                       ),
@@ -265,13 +342,24 @@ class UjianScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.menu_book, size: 16, color: AppColors.textSecondary),
+                        const Icon(
+                          Icons.menu_book_rounded,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
                         const SizedBox(width: 4),
                         Text(ujian.namaMapel, style: AppTextStyles.smallText),
                         const SizedBox(width: 12),
-                        const Icon(Icons.format_list_bulleted, size: 16, color: AppColors.textSecondary),
+                        const Icon(
+                          Icons.format_list_bulleted_rounded,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
                         const SizedBox(width: 4),
-                        Text('${ujian.jumlahSoal} Soal', style: AppTextStyles.smallText),
+                        Text(
+                          '${ujian.jumlahSoal} Soal',
+                          style: AppTextStyles.smallText,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -280,11 +368,10 @@ class UjianScreen extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: null,
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(
+                            color: AppColors.borderSubtle,
                           ),
-                          side: const BorderSide(color: AppColors.divider),
                         ),
                         child: Text(
                           'Belum Dibuka',

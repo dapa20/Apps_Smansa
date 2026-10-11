@@ -119,46 +119,58 @@ class _PemindaiScreenState extends State<PemindaiScreen> with SingleTickerProvid
             ),
           ),
           
-          // Bottom Panel
+          // Bottom Panel — pakai SafeArea untuk hindarin navigation bar OS.
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.only(top: 32, bottom: 48, left: 24, right: 24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.0),
-                    Colors.black.withValues(alpha: 0.8),
-                    Colors.black,
-                  ],
-                ),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'Arahkan kamera ke QR Code / Barcode',
-                    style: AppTextStyles.bodyText.copyWith(color: Colors.white),
+            child: SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.0),
+                      Colors.black.withValues(alpha: 0.8),
+                      Colors.black,
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.white),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Arahkan kamera ke QR Code / Barcode',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyText.copyWith(
+                        color: Colors.white,
                       ),
                     ),
-                    child: Text(
-                      'Masukkan Kode Manual',
-                      style: AppTextStyles.cardTitle.copyWith(color: Colors.white),
+                    const SizedBox(height: 24),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        'Masukkan Kode Manual',
+                        style: AppTextStyles.cardTitle.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

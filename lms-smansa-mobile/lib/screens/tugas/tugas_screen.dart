@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
@@ -7,7 +8,6 @@ import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/back_button_overlay.dart';
-import 'package:intl/intl.dart';
 
 class TugasScreen extends StatefulWidget {
   const TugasScreen({super.key});
@@ -76,6 +76,7 @@ class _TugasScreenState extends State<TugasScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: const BackLeadingButton(),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Text(
@@ -85,15 +86,6 @@ class _TugasScreenState extends State<TugasScreen> {
             fontSize: 18,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Stack(
         children: [
@@ -132,7 +124,12 @@ class _TugasScreenState extends State<TugasScreen> {
     if (_loading) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 60),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: AppColors.primaryBlue,
+          ),
+        ),
       );
     }
 
@@ -141,10 +138,18 @@ class _TugasScreenState extends State<TugasScreen> {
         padding: const EdgeInsets.symmetric(vertical: 40),
         child: Column(
           children: [
-            const Icon(
-              Icons.cloud_off,
-              size: 48,
-              color: AppColors.textSecondary,
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.cloud_off_rounded,
+                size: 32,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -164,9 +169,31 @@ class _TugasScreenState extends State<TugasScreen> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 40),
         child: Center(
-          child: Text(
-            isSelesaiTab ? 'Belum ada tugas selesai' : 'Tidak ada tugas aktif',
-            style: AppTextStyles.bodySecondary,
+          child: Column(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isSelesaiTab
+                      ? Icons.task_alt_rounded
+                      : Icons.assignment_outlined,
+                  size: 36,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                isSelesaiTab
+                    ? 'Belum ada tugas selesai'
+                    : 'Tidak ada tugas aktif',
+                style: AppTextStyles.bodySecondary,
+              ),
+            ],
           ),
         ),
       );
@@ -192,12 +219,14 @@ class _TugasScreenState extends State<TugasScreen> {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -206,13 +235,14 @@ class _TugasScreenState extends State<TugasScreen> {
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => isSelesaiTab = false),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: !isSelesaiTab
                       ? AppColors.primaryBlue
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -231,13 +261,14 @@ class _TugasScreenState extends State<TugasScreen> {
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => isSelesaiTab = true),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: isSelesaiTab
                       ? AppColors.primaryBlue
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -278,99 +309,92 @@ class _TugasScreenState extends State<TugasScreen> {
       margin: const EdgeInsets.only(bottom: AppConstants.itemSpacing),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+            spreadRadius: -2,
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        child: Container(
-          decoration: const BoxDecoration(
-            border: Border(
-              left: BorderSide(
-                color: AppColors.leftBorderBlue,
-                width: AppConstants.leftBorderWidth,
-              ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                StatusChip(label: status.toUpperCase(), type: statusType),
+                const Icon(
+                  Icons.more_horiz_rounded,
+                  color: AppColors.textTertiary,
+                ),
+              ],
             ),
-          ),
-          padding: const EdgeInsets.all(AppConstants.cardPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  StatusChip(label: status.toUpperCase(), type: statusType),
-                  const Icon(Icons.more_horiz, color: AppColors.textSecondary),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(tugas['judul'] ?? '-', style: AppTextStyles.cardTitle),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.menu_book,
-                    size: 16,
-                    color: AppColors.textSecondary,
+            const SizedBox(height: 12),
+            Text(tugas['judul'] ?? '-', style: AppTextStyles.cardTitle),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(
+                  Icons.menu_book_rounded,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    tugas['nama_mapel'] ?? '',
+                    style: AppTextStyles.smallText,
                   ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      tugas['nama_mapel'] ?? '',
-                      style: AppTextStyles.smallText,
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(color: AppColors.divider, height: 1),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 16,
+                      color: isOverdue
+                          ? AppColors.dangerRed
+                          : AppColors.textSecondary,
                     ),
-                  ),
-                ],
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(color: AppColors.divider, height: 1),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 16,
+                    const SizedBox(width: 6),
+                    Text(
+                      deadline != null ? formatter.format(deadline) : '-',
+                      style: AppTextStyles.smallText.copyWith(
                         color: isOverdue
                             ? AppColors.dangerRed
                             : AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        deadline != null ? formatter.format(deadline) : '-',
-                        style: AppTextStyles.smallText.copyWith(
-                          color: isOverdue
-                              ? AppColors.dangerRed
-                              : AppColors.textSecondary,
-                          fontWeight: isOverdue
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (status != 'terkumpul' && status != 'dinilai')
-                    Text(
-                      status == 'terlambat' ? 'Kirim Susulan' : 'Kerjakan',
-                      style: GoogleFonts.inter(
-                        color: AppColors.primaryBlue,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontWeight: isOverdue
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                       ),
                     ),
-                ],
-              ),
-            ],
-          ),
+                  ],
+                ),
+                if (status != 'terkumpul' && status != 'dinilai')
+                  Text(
+                    status == 'terlambat' ? 'Kirim Susulan' : 'Kerjakan',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.primaryBlue,
+                      fontSize: 13,
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );

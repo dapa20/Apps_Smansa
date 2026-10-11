@@ -65,6 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(title),
         content: Text(message),
         actions: [
@@ -81,54 +82,97 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // ─── Header ─────────────────────────────────────────────
-            ClipPath(
-              clipper: _LoginCurveClipper(),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 72, 24, 72),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.primaryBlueDark, AppColors.primaryBlue],
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipPath(
+                clipper: _LoginCurveClipper(),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(
+                    24,
+                    MediaQuery.of(context).padding.top + 40,
+                    24,
+                    MediaQuery.of(context).padding.bottom + 60,
                   ),
-                ),
-                child: Column(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF1D4ED8),
+                        Color(0xFF2563EB),
+                        Color(0xFF3B82F6),
+                      ],
+                      stops: [0.0, 0.55, 1.0],
+                    ),
+                  ),
+                child: Stack(
                   children: [
-                    Container(
-                      width: 88,
-                      height: 88,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
+                    // Decorative blobs
+                    Positioned(
+                      top: -30,
+                      right: -50,
+                      child: Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.06),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 90,
+                      left: -30,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.04),
+                        ),
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                          width: 96,
+                          height: 96,
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.18),
+                                blurRadius: 20,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        'assets/images/logo_smansa.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      AppConstants.schoolName,
-                      style: AppTextStyles.headerTitle,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Masuk untuk mengakses LMS',
-                      style: AppTextStyles.headerSubtitle,
+                          child: Image.asset(
+                            'assets/images/logo_smansa.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          AppConstants.schoolName,
+                          style: AppTextStyles.headerTitle.copyWith(
+                            fontSize: 22,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Masuk untuk mengakses LMS',
+                          style: AppTextStyles.headerSubtitle,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -139,17 +183,22 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Transform.translate(
-                offset: const Offset(0, -32),
+                offset: const Offset(0, -36),
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: AppColors.borderSubtle,
+                      width: 1,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
+                        color: AppColors.primaryBlue.withValues(alpha: 0.08),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
+                        spreadRadius: -4,
                       ),
                     ],
                   ),
@@ -159,8 +208,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Selamat Datang 👋',
-                          style: AppTextStyles.sectionTitle,
+                          'Selamat Datang',
+                          style: AppTextStyles.sectionTitle.copyWith(
+                            fontSize: 22,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -172,8 +223,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         // NIS
                         Text(
                           'NIS',
-                          style: AppTextStyles.bodyText.copyWith(
-                            fontWeight: FontWeight.w600,
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -183,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
-                          style: AppTextStyles.bodyText,
+                          style: AppTextStyles.bodyMedium,
                           decoration: _inputDecoration(
                             hint: 'Masukkan NIS',
                             icon: Icons.badge_outlined,
@@ -200,25 +252,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Password
                         Text(
                           'Password',
-                          style: AppTextStyles.bodyText.copyWith(
-                            fontWeight: FontWeight.w600,
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
                           ),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
-                          style: AppTextStyles.bodyText,
+                          style: AppTextStyles.bodyMedium,
                           decoration:
                               _inputDecoration(
                                 hint: 'Masukkan password',
-                                icon: Icons.lock_outline,
+                                icon: Icons.lock_outline_rounded,
                               ).copyWith(
                                 suffixIcon: IconButton(
                                   icon: Icon(
                                     _obscurePassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
+                                        ? Icons.visibility_off_rounded
+                                        : Icons.visibility_rounded,
                                     color: AppColors.textSecondary,
                                     size: 20,
                                   ),
@@ -249,11 +302,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                 'Silakan hubungi operator/administrator sekolah untuk mereset password Anda.',
                               );
                             },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                            ),
                             child: Text(
                               'Lupa Password?',
-                              style: AppTextStyles.smallText.copyWith(
+                              style: AppTextStyles.caption.copyWith(
                                 color: AppColors.primaryBlue,
                                 fontWeight: FontWeight.w600,
+                                fontSize: 12,
                               ),
                             ),
                           ),
@@ -292,25 +351,30 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.chipBlueBg,
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primaryBlueTint,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: AppColors.primaryBlue.withValues(alpha: 0.15),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.info_outline,
+                          Icons.info_outline_rounded,
                           color: AppColors.primaryBlue,
                           size: 18,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             'Gunakan NIS & password yang diberikan oleh sekolah Anda.',
-                            style: AppTextStyles.smallText.copyWith(
+                            style: AppTextStyles.caption.copyWith(
                               color: AppColors.primaryBlue,
                               fontWeight: FontWeight.w500,
+                              fontSize: 12,
                             ),
                           ),
                         ),
@@ -320,13 +384,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   Text(
                     '© ${DateTime.now().year} ${AppConstants.schoolName}',
-                    style: AppTextStyles.smallText.copyWith(fontSize: 11),
+                    style: AppTextStyles.caption,
                   ),
                 ],
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -337,26 +402,37 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: AppTextStyles.bodySecondary,
+      hintStyle: AppTextStyles.bodySecondary.copyWith(
+        color: AppColors.textTertiary,
+      ),
       prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 22),
       filled: true,
-      fillColor: AppColors.background,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      fillColor: AppColors.surfaceMuted,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16,
+      ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.divider),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppColors.borderSubtle, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.6),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(
+          color: AppColors.primaryBlue,
+          width: 1.6,
+        ),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.dangerRed),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppColors.dangerRed, width: 1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.dangerRed, width: 1.6),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(
+          color: AppColors.dangerRed,
+          width: 1.6,
+        ),
       ),
     );
   }
