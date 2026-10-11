@@ -231,28 +231,43 @@ class _BerandaScreenState extends State<BerandaScreen> {
                 ),
               ),
             ),
-            // Decorative soft blobs
+            // ─── Decorative blobs (3 overlap) ──────────────────────
+            // Blob 1 — besar kanan-atas (overflow keluar header)
             Positioned(
-              top: -50,
-              right: -50,
+              top: -110,
+              right: -90,
               child: Container(
-                width: 180,
-                height: 180,
+                width: 340,
+                height: 340,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.06),
+                  color: Colors.white.withValues(alpha: 0.14),
                 ),
               ),
             ),
+            // Blob 2 — medium kiri-bawah (overflow)
             Positioned(
-              top: 80,
-              right: 80,
+              bottom: -80,
+              left: -100,
               child: Container(
-                width: 100,
-                height: 100,
+                width: 280,
+                height: 280,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.04),
+                  color: Colors.white.withValues(alpha: 0.10),
+                ),
+              ),
+            ),
+            // Blob 3 — medium kanan-tengah, overlap dengan blob 1
+            Positioned(
+              top: 40,
+              right: -30,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.08),
                 ),
               ),
             ),
@@ -315,19 +330,20 @@ class _BerandaScreenState extends State<BerandaScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
+                              horizontal: 10,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.accentYellow,
@@ -338,40 +354,48 @@ class _BerandaScreenState extends State<BerandaScreen> {
                               style: AppTextStyles.caption.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
-                                fontSize: 11,
+                                fontSize: 10,
                                 letterSpacing: 0.5,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           Text(
                             'Halo, $_nama',
                             style: AppTextStyles.headerTitle.copyWith(
-                              fontSize: 24,
+                              fontSize: 22,
+                              height: 1.2,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Semangat belajar hari ini!',
-                            style: AppTextStyles.headerSubtitle,
+                            style: AppTextStyles.headerSubtitle.copyWith(
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(width: 12),
                     Container(
-                      width: 80,
-                      height: 80,
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.18),
+                          color: Colors.white.withValues(alpha: 0.20),
                           width: 1,
                         ),
                       ),
                       child: const Icon(
                         Icons.waving_hand_rounded,
-                        size: 40,
+                        size: 28,
                         color: Colors.white,
                       ),
                     ),

@@ -88,40 +88,51 @@ class _ProfilScreenState extends State<ProfilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Pakai LayoutBuilder untuk adaptasi avatar offset & header height
-    // berdasarkan lebar layar (responsif).
     final width = MediaQuery.of(context).size.width;
     final size = AppConstants.getScreenSize(width);
 
-    // Offset avatar dari top header. Pada layar kecil avatar lebih dekat,
-    // pada layar besar agak turun supaya lebih proporsional.
-    final double avatarOffset = size == ScreenSize.small ? 80 : 100;
-    // Extra spacer di bawah avatar supaya tidak overlap dengan stat cards.
-    final double avatarSpacer = size == ScreenSize.small ? 70 : 90;
+    // Header biru compact (tinggi 100). Avatar setengah keluar
+    // (offset 70) sehingga avatar dari top header = 70, dengan
+    // tinggi avatar 76, avatar berakhir di y = 146.
+    final double headerHeight = size == ScreenSize.small ? 95 : 110;
+    final double avatarOffset = size == ScreenSize.small ? 65 : 78;
+    final double avatarSize = size == ScreenSize.small ? 76 : 88;
+    // Spacer di bawah avatar = tinggi avatar + ruang kosong supaya
+    // tidak overlap dengan nama & stat cards.
+    final double avatarSpacer =
+        size == ScreenSize.small ? 50 : 58;
 
     return Container(
       color: AppColors.background,
       child: SingleChildScrollView(
         child: Column(
           children: [
-            // Header + avatar overlap (Stack pattern yang clean).
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
-              children: [
-                // 1) Header biru
-                BlueHeader(
-                  title: 'Profil Siswa',
-                  height: 170,
-                ),
-                // 2) Avatar circle — pakai Positioned dengan center alignment
-                Positioned(
-                  top: avatarOffset,
-                  left: 0,
-                  right: 0,
-                  child: _buildAvatarSection(),
-                ),
-              ],
+            // Header polos (tanpa title karena avatar akan overlap).
+            // Title dipindah ke konten utama di bawah avatar.
+            SizedBox(
+              height: headerHeight,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  BlueHeader(
+                    title: '',
+                    height: headerHeight,
+                  ),
+                  // Avatar diposisikan center, setengah di dalam & di luar header.
+                  Positioned(
+                    top: avatarOffset,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: SizedBox(
+                        width: avatarSize,
+                        height: avatarSize,
+                        child: _buildAvatarCircle(size: avatarSize),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             // Spacer supaya konten berikutnya tidak tertutup avatar.
             SizedBox(height: avatarSpacer),
@@ -169,6 +180,10 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 ),
               )
             else ...[
+              // Nama & NISN & kelas — di bawah avatar, bukan di atas.
+              // Hindari tumpang tindih dengan avatar.
+              _buildNameSection(),
+              const SizedBox(height: 16),
               // Stat cards (KEHADIRAN & TOTAL HADIR) — pakai responsive padding
               ResponsivePadding(
                 child: LayoutBuilder(
@@ -222,7 +237,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 20),
               // Menu PENGATURAN AKUN — section title + 3 menu cards
               ResponsivePadding(
                 child: Column(
@@ -274,57 +289,61 @@ class _ProfilScreenState extends State<ProfilScreen> {
               ),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             Text(AppConstants.appVersion, style: AppTextStyles.caption),
-            const SizedBox(height: 40),
+            const SizedBox(height: 80),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAvatarSection() {
+  Widget _buildAvatarCircle({double size = 92}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 4),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+            spreadRadius: -2,
+          ),
+        ],
+      ),
+      child: Icon(
+        Icons.person_rounded,
+        size: size * 0.5,
+        color: AppColors.textSecondary,
+      ),
+    );
+  }
+
+  Widget _buildNameSection() {
     final nama = _siswa?['nama_lengkap'] as String? ?? 'Siswa';
     final nisn = _siswa?['nisn'] as String? ?? '-';
     final kelas = (_siswa?['nama_kelas'] as String? ?? 'Kelas');
 
     return Column(
       children: [
-        Container(
-          width: 104,
-          height: 104,
-          decoration: BoxDecoration(
-            color: AppColors.surfaceMuted,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 4),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.cardShadow,
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-                spreadRadius: -2,
-              ),
-            ],
-          ),
-          child: Icon(
-            Icons.person_rounded,
-            size: 52,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 14),
-        // Nama — batasi max width supaya tidak overflow di layar kecil
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 320),
           child: Text(
             nama,
             textAlign: TextAlign.center,
-            style: AppTextStyles.sectionTitle.copyWith(fontSize: 22),
+            style: AppTextStyles.sectionTitle.copyWith(
+              fontSize: 20,
+              height: 1.2,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -337,15 +356,15 @@ class _ProfilScreenState extends State<ProfilScreen> {
             Flexible(
               child: Text(
                 nisn,
-                style: AppTextStyles.bodySecondary,
+                style: AppTextStyles.bodySecondary.copyWith(fontSize: 13),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
             color: AppColors.chipYellowBg,
             borderRadius: BorderRadius.circular(999),
@@ -354,6 +373,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
             kelas.toUpperCase(),
             style: AppTextStyles.chipText.copyWith(
               color: AppColors.chipYellowText,
+              fontSize: 11,
             ),
           ),
         ),

@@ -112,28 +112,43 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 child: Stack(
                   children: [
-                    // Decorative blobs
+                    // ─── Decorative blobs (3 overlap) ────────────────
+                    // Blob 1 — besar kanan-atas (overflow)
                     Positioned(
-                      top: -30,
-                      right: -50,
+                      top: -90,
+                      right: -70,
+                      child: Container(
+                        width: 280,
+                        height: 280,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.14),
+                        ),
+                      ),
+                    ),
+                    // Blob 2 — medium kiri-bawah (overflow)
+                    Positioned(
+                      bottom: -60,
+                      left: -80,
+                      child: Container(
+                        width: 240,
+                        height: 240,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.10),
+                        ),
+                      ),
+                    ),
+                    // Blob 3 — medium kanan-tengah, overlap dengan blob 1
+                    Positioned(
+                      top: 30,
+                      right: -20,
                       child: Container(
                         width: 180,
                         height: 180,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.06),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 90,
-                      left: -30,
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.04),
+                          color: Colors.white.withValues(alpha: 0.08),
                         ),
                       ),
                     ),
@@ -148,15 +163,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.18),
-                                blurRadius: 20,
-                                offset: const Offset(0, 6),
+                                color: Colors.black.withValues(alpha: 0.10),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: Image.asset(
-                            'assets/images/logo_smansa.png',
-                            fit: BoxFit.contain,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/logo_smansa.png',
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.school,
+                                  size: 50,
+                                  color: AppColors.primaryBlue,
+                                );
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),

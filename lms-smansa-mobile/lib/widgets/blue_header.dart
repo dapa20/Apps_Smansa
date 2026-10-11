@@ -67,16 +67,44 @@ class BlueHeader extends StatelessWidget {
                 ),
               ),
             ),
-            // Decorative blob (lingkaran samar di pojok)
+            // ─── Decorative blobs (3 lingkaran pudar tumpang tindih) ─
+            // Pattern referensi: 3 blob overlap membentuk pola premium.
+            // Blob 1 — besar kanan-atas (overflow keluar header)
             Positioned(
-              top: -40,
-              right: -40,
+              top: -100,
+              right: -80,
               child: Container(
-                width: 160,
-                height: 160,
+                width: 320,
+                height: 320,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.06),
+                  color: Colors.white.withValues(alpha: 0.14),
+                ),
+              ),
+            ),
+            // Blob 2 — medium kiri-tengah, overlap dengan blob 1
+            Positioned(
+              top: 40,
+              left: -120,
+              child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.10),
+                ),
+              ),
+            ),
+            // Blob 3 — besar kanan-tengah, overlap dengan blob 1
+            Positioned(
+              top: 30,
+              right: -40,
+              child: Container(
+                width: 220,
+                height: 220,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.08),
                 ),
               ),
             ),
@@ -84,7 +112,7 @@ class BlueHeader extends StatelessWidget {
             SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 56),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -99,9 +127,10 @@ class BlueHeader extends StatelessWidget {
                       ),
                     if (leading != null || trailing != null)
                       const SizedBox(height: 14),
-                    Text(title, style: AppTextStyles.headerTitle),
+                    if (title.isNotEmpty)
+                      Text(title, style: AppTextStyles.headerTitle),
                     if (subtitle != null) ...[
-                      const SizedBox(height: 6),
+                      if (title.isNotEmpty) const SizedBox(height: 6),
                       Text(
                         subtitle!,
                         style: AppTextStyles.headerSubtitle,
