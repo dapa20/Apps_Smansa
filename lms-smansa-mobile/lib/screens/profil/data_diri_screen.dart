@@ -27,8 +27,6 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
   @override
   void initState() {
     super.initState();
-    // Pakai cache siswa dulu (supaya profil tampil cepat),
-    // lalu refresh dari API di background.
     _data = AuthService.instance.cachedSiswa == null
         ? null
         : {'siswa': AuthService.instance.cachedSiswa};

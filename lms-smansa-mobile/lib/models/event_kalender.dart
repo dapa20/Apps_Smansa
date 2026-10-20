@@ -2,7 +2,7 @@ class EventKalender {
   final DateTime tanggalMulai;
   final DateTime tanggalSelesai;
   final String judul;
-  final String kategori; // 'akademik' | 'libur' | 'kegiatan'
+  final String kategori; 
   final String? waktu;
   final String? lokasi;
   final String? deskripsi;

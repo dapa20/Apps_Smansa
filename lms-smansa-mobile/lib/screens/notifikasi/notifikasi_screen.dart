@@ -24,7 +24,6 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
   @override
   void initState() {
     super.initState();
-    // Tandai semua notifikasi sudah dibaca saat user masuk tab ini
     NotificationBadgeController.instance.markAllAsRead();
     _load();
   }

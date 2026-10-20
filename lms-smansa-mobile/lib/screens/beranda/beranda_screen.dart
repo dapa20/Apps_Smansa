@@ -50,7 +50,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
   void initState() {
     super.initState();
     _load();
-    // Refresh badge notifikasi & listen perubahannya
     NotificationBadgeController.instance.addListener(_onBadgeChanged);
     NotificationBadgeController.instance.refresh();
   }
@@ -62,7 +61,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
   }
 
   void _onBadgeChanged() {
-    if (mounted) setState(() {}); // rebuild header untuk update badge
+    if (mounted) setState(() {}); 
   }
 
   Future<void> _load() async {
@@ -135,7 +134,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
                   count: _pengumuman.length,
                   actionLabel: 'Lihat semua',
                   onActionTap: () {
-                    // Pindah ke tab Berita di MainShell (index 2)
                     MainShellController.instance.switchToTab(2);
                   },
                 ),
@@ -178,7 +176,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
       ),
       child: Stack(
         children: [
-          // Pola garis tipis.
+          
           Positioned.fill(
             child: IgnorePointer(
               child: CustomPaint(painter: _HeaderPatternPainter()),
@@ -433,7 +431,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: () {
-            // Pindah ke tab Notifikasi (index 1 di MainShell)
             MainShellController.instance.switchToTab(1);
           },
           child: Stack(
@@ -713,7 +710,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Strip visual atas dengan ikon kategori.
                 Container(
                   height: 52,
                   padding: const EdgeInsets.symmetric(horizontal: 16),

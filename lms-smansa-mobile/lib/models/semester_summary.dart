@@ -1,7 +1,7 @@
 class SemesterSummary {
   final int semesterKe;
   final String tahunAjaran;
-  final String periode; // 'Ganjil' | 'Genap'
+  final String periode;
   final double ips;
   final double target;
 

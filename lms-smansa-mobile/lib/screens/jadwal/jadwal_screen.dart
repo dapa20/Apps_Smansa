@@ -32,7 +32,6 @@ class _JadwalScreenState extends State<JadwalScreen> {
   static String _defaultHari() {
     const daftar = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     final now = DateTime.now();
-    // DateTime.monday = 1 ... sunday = 7
     final idx = now.weekday - 1;
     if (idx >= 0 && idx < daftar.length) return daftar[idx];
     return 'Senin';

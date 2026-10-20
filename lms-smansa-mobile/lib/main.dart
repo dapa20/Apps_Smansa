@@ -4,8 +4,6 @@ import 'app/app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Inisialisasi locale Indonesia untuk DateFormat('...', 'id_ID')
-  // agar mencegah LocaleDataException di semua screen.
   initializeDateFormatting('id_ID', null).then((_) {
     runApp(const LmsSmansaApp());
   });

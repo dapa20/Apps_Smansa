@@ -1,7 +1,7 @@
 class Berita {
   final int id;
   final String judul;
-  final String kategori; // 'pengumuman' | 'prestasi' | 'kegiatan'
+  final String kategori;
   final String? gambarUrl;
   final String konten;
   final DateTime createdAt;

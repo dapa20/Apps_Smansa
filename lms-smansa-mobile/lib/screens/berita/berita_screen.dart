@@ -173,7 +173,6 @@ class _BeritaScreenState extends State<BeritaScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Cover abstrak karena data tidak menyertakan gambar.
           Container(
             height: 132,
             width: double.infinity,
@@ -370,7 +369,6 @@ class _BeritaScreenState extends State<BeritaScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Blok tanggal.
           Container(
             width: 52,
             padding: const EdgeInsets.symmetric(vertical: 10),

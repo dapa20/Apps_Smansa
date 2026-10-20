@@ -2,9 +2,9 @@ class Tugas {
   final int id;
   final String judul;
   final String namaMapel;
-  final String status; // 'menunggu' | 'terlambat' | 'selesai'
+  final String status;
   final DateTime deadline;
-  final String? aksiLabel; // 'Kerjakan' | 'Kirim Susulan' | 'Detail'
+  final String? aksiLabel;
 
   const Tugas({
     required this.id,

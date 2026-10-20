@@ -1,7 +1,7 @@
 class Ujian {
   final int id;
   final String judul;
-  final String jenis; // 'kuis' | 'uts' | 'uas'
+  final String jenis;
   final String namaMapel;
   final String namaGuru;
   final String namaKelas;
@@ -9,7 +9,7 @@ class Ujian {
   final String tipeSoal;
   final DateTime jadwal;
   final int? sisaMenit;
-  final String status; // 'berlangsung' | 'mendatang' | 'selesai'
+  final String status;
 
   const Ujian({
     required this.id,

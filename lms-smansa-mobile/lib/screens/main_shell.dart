@@ -25,7 +25,6 @@ class _MainShellState extends State<MainShell> {
   @override
   void initState() {
     super.initState();
-    // Sinkronkan index MainShell dengan controller global
     MainShellController.instance.addListener(_onControllerChanged);
     _currentIndex = MainShellController.instance.currentIndex;
   }

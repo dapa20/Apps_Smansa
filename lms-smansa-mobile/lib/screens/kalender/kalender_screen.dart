@@ -29,7 +29,6 @@ class _KalenderScreenState extends State<KalenderScreen> {
   String? _error;
   String _subtitle = 'Tahun Ajaran Aktif';
 
-  // Rentang kalender dinamis mengikuti tahun berjalan
   late final DateTime _firstDay;
   late final DateTime _lastDay;
 
@@ -47,7 +46,6 @@ class _KalenderScreenState extends State<KalenderScreen> {
     _load();
   }
 
-  /// Ambil event kalender dari backend (realtime).
   Future<void> _load() async {
     setState(() {
       _loading = true;
@@ -358,7 +356,6 @@ class _KalenderScreenState extends State<KalenderScreen> {
     }
 
     final today = DateTime.now();
-    // Tampilkan agenda dari hari ini & mendatang saja
     final upcoming = _events.where((e) {
       return !e.tanggalSelesai.isBefore(
         DateTime(today.year, today.month, today.day),

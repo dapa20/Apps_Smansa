@@ -34,7 +34,6 @@ class _PemindaiScreenState extends State<PemindaiScreen>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Simulasi viewfinder kamera.
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -56,7 +55,6 @@ class _PemindaiScreenState extends State<PemindaiScreen>
             ),
           ),
 
-          // Overlay gelap dengan cutout.
           Positioned.fill(
             child: ColorFiltered(
               colorFilter: ColorFilter.mode(
@@ -83,7 +81,6 @@ class _PemindaiScreenState extends State<PemindaiScreen>
             ),
           ),
 
-          // Bingkai pemindai + garis animasi.
           Center(
             child: SizedBox(
               width: 268,
@@ -137,7 +134,6 @@ class _PemindaiScreenState extends State<PemindaiScreen>
             ),
           ),
 
-          // Top bar.
           Positioned(
             top: 0,
             left: 0,
@@ -204,7 +200,6 @@ class _PemindaiScreenState extends State<PemindaiScreen>
             ),
           ),
 
-          // Panel bawah.
           Positioned(
             bottom: 0,
             left: 0,
@@ -345,7 +340,6 @@ class _ScannerCornersPainter extends CustomPainter {
     const length = 34.0;
     const radius = 20.0;
 
-    // Kiri atas.
     canvas.drawPath(
       Path()
         ..moveTo(0, length)
@@ -355,7 +349,6 @@ class _ScannerCornersPainter extends CustomPainter {
       paint,
     );
 
-    // Kanan atas.
     canvas.drawPath(
       Path()
         ..moveTo(size.width - length, 0)
@@ -365,7 +358,6 @@ class _ScannerCornersPainter extends CustomPainter {
       paint,
     );
 
-    // Kiri bawah.
     canvas.drawPath(
       Path()
         ..moveTo(0, size.height - length)
@@ -375,7 +367,6 @@ class _ScannerCornersPainter extends CustomPainter {
       paint,
     );
 
-    // Kanan bawah.
     canvas.drawPath(
       Path()
         ..moveTo(size.width - length, size.height)
