@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
 
-/// Exception khusus untuk error API dengan pesan yang bisa ditampilkan.
 class ApiException implements Exception {
   final String message;
   final int? statusCode;
@@ -14,19 +13,15 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
-/// Klien HTTP untuk memanggil API backend.
-///
+
+
 /// Mengirim token pada header `Authorization: Bearer <token>` (jika ada).
 /// Semua method mengembalikan `Map<String, dynamic>` hasil parsing JSON.
 class ApiClient {
   ApiClient({String? token}) : _token = token;
 
   String? _token;
-
-  /// Token aktif (null jika belum login).
   String? get token => _token;
-
-  /// Ganti token aktif (dipakai saat login/logout).
   set token(String? value) => _token = value;
 
   Map<String, String> get _headers {
@@ -46,7 +41,6 @@ class ApiClient {
     ).replace(queryParameters: query);
   }
 
-  /// GET request.
   Future<Map<String, dynamic>> get(
     String path, {
     Map<String, String>? query,
@@ -55,7 +49,6 @@ class ApiClient {
     return _decode(res);
   }
 
-  /// POST request (JSON body).
   Future<Map<String, dynamic>> post(
     String path, {
     Map<String, dynamic>? body,
@@ -69,7 +62,6 @@ class ApiClient {
     return _decode(res);
   }
 
-  /// POST request dengan multipart (untuk upload file tugas).
   Future<Map<String, dynamic>> postMultipart(
     String path, {
     Map<String, String>? fields,

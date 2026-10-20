@@ -48,7 +48,7 @@ class AuthService {
     return res;
   }
 
-  /// Cek apakah ada token tersimpan (untuk auto-login).
+
   Future<bool> tryRestoreSession() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(ApiConfig.tokenKey);
@@ -69,10 +69,6 @@ class AuthService {
     return true;
   }
 
-  /// Validasi token ke server. Jika token basi/tidak valid (401),
-  /// sesi lokal dihapus dan mengembalikan false (harus login ulang).
-  /// Jika error jaringan / server tidak terjangkau, kembalikan true
-  /// (biarkan sesi, halaman akan menampilkan error "gagal memuat").
   Future<bool> validateSession() async {
     try {
       await _client.get('/profil.php');
@@ -82,20 +78,16 @@ class AuthService {
         await logout();
         return false;
       }
-      // Error lain (mis. server down, 500): jangan paksa logout.
-      return true;
+      
     } catch (_) {
-      // Jaringan bermasalah: jangan paksa logout.
       return true;
     }
   }
 
-  /// Logout: hapus token lokal DAN curry token di server.
   Future<void> logout() async {
     try {
       await _client.post('/auth/logout.php');
     } catch (_) {
-      // Abaikan error server saat logout; tetap bersihkan lokal.
     }
     _client.token = null;
     cachedSiswa = null;
@@ -104,7 +96,5 @@ class AuthService {
     await prefs.remove(ApiConfig.tokenKey);
     await prefs.remove(ApiConfig.siswaKey);
   }
-
-  /// Dapatkan ApiClient dengan token aktif.
   ApiClient get client => _client;
 }

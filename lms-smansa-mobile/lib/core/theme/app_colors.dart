@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Palet warna aplikasi LMS SMANSA Mobile.
-///
-/// Arah desain: "Deep Ocean Academic" — biru navy yang tenang dipadukan
-/// dengan aksen cyan, mint, dan amber. Permukaan terang dengan tint biru
-/// tipis agar terasa premium namun tetap ringan dan mudah dibaca.
 class AppColors {
   AppColors._();
 
@@ -56,21 +51,16 @@ class AppColors {
   static const Color borderSubtle = Color(0xFFE3EAF5);
   static const Color borderStrong = Color(0xFFD3DEF0);
 
-  /// Overlay untuk efek glassmorphism di atas gradient.
   static const Color glassOverlay = Color(0x1FFFFFFF);
 
-  /// Inner divider halus.
   static const Color divider = Color(0xFFEBF0F8);
 
-  /// Shadow kartu (alpha rendah, blur besar) — soft modern.
   static const Color cardShadow = Color(0x0D0B1B3A);
   static const Color cardShadowStrong = Color(0x1A0B1B3A);
 
-  /// Left border accent (untuk beberapa card list).
   static const Color leftBorderBlue = Color(0xFF2563EB);
 
-  // ====== Gradients ======
-  /// Gradient utama untuk hero header & splash.
+
   static const List<Color> heroGradient = [
     Color(0xFF081538),
     Color(0xFF102C6B),
@@ -78,31 +68,29 @@ class AppColors {
     Color(0xFF3B82F6),
   ];
 
-  /// Gradient tombol utama.
   static const List<Color> primaryGradient = [
     Color(0xFF1D4ED8),
     Color(0xFF3B82F6),
   ];
 
-  /// Gradient aksen cyan.
+
   static const List<Color> cyanGradient = [
     Color(0xFF0EA5E9),
     Color(0xFF22D3EE),
   ];
 
-  /// Gradient mint.
   static const List<Color> mintGradient = [
     Color(0xFF059669),
     Color(0xFF34D399),
   ];
 
-  /// Gradient amber.
+
   static const List<Color> amberGradient = [
     Color(0xFFD97706),
     Color(0xFFFBBF24),
   ];
 
-  /// Gradient ungu.
+
   static const List<Color> purpleGradient = [
     Color(0xFF6D28D9),
     Color(0xFFA78BFA),

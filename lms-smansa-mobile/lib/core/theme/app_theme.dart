@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// Theme "Deep Ocean Academic":
-/// - Material 3, palet biru navy + aksen cyan/mint.
-/// - Radius besar (18/22/28) dengan border hairline.
-/// - Permukaan putih di atas background biru sangat muda.
-/// - Tipografi Plus Jakarta Sans dengan tracking rapat.
 class AppTheme {
   AppTheme._();
 

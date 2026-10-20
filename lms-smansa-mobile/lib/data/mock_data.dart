@@ -9,7 +9,7 @@ import '../models/berita.dart';
 import '../models/event_kalender.dart';
 import '../models/portal_item.dart';
 
-// ─── SISWA ──────────────────────────────────────────────────────────
+//SISWA 
 class MockSiswa {
   static const siswaLogin = Siswa(
     id: 4,
@@ -23,7 +23,7 @@ class MockSiswa {
   );
 }
 
-// ─── JADWAL ─────────────────────────────────────────────────────────
+//JADWAL 
 class MockJadwal {
   static const Map<String, List<JadwalItem>> jadwalPerHari = {
     'Senin': [
@@ -58,7 +58,7 @@ class MockJadwal {
   };
 }
 
-// ─── TUGAS ───────────────────────────────────────────────────────────
+//TUGAS
 class MockTugas {
   static final List<Tugas> belumSelesai = [
     Tugas(
@@ -103,7 +103,7 @@ class MockTugas {
   ];
 }
 
-// ─── UJIAN ───────────────────────────────────────────────────────────
+//UJIAN
 class MockUjian {
   static final List<Ujian> berlangsung = [
     Ujian(
@@ -149,7 +149,7 @@ class MockUjian {
   ];
 }
 
-// ─── NILAI ───────────────────────────────────────────────────────────
+//NILAI
 class MockNilai {
   static const List<SemesterSummary> semesters = [
     SemesterSummary(semesterKe: 4, tahunAjaran: '2023/2024', periode: 'Genap', ips: 90.2, target: 85.0),
@@ -170,7 +170,7 @@ class MockNilai {
   ];
 }
 
-// ─── BERITA ──────────────────────────────────────────────────────────
+//BERITA
 class MockBerita {
   static final List<Berita> daftarBerita = [
     Berita(
@@ -204,7 +204,7 @@ class MockBerita {
   ];
 }
 
-// ─── KALENDER ────────────────────────────────────────────────────────
+//KALENDER
 class MockKalender {
   static final List<EventKalender> events = [
     EventKalender(
@@ -246,7 +246,7 @@ class MockKalender {
   ];
 }
 
-// ─── SMANSAGO ────────────────────────────────────────────────────────
+//SMANSAGO
 class MockSmansago {
   static const List<PortalItem> portals = [
     PortalItem(judul: 'E-Rapor', deskripsi: 'Lihat rapor digital', ikonName: 'assignment'),
@@ -262,7 +262,7 @@ class MockSmansago {
   ];
 }
 
-// ─── NOTIFIKASI ──────────────────────────────────────────────────────
+//NOTIFIKASI
 class MockNotifikasi {
   static final List<Map<String, dynamic>> daftarNotifikasi = [
     {

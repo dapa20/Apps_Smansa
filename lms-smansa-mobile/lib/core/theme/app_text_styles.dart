@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// Typography scale untuk desain "Deep Ocean Academic".
-///
-/// Display & heading memakai Plus Jakarta Sans (geometris, modern, ramah),
-/// dengan tracking negatif tipis agar terasa seperti aplikasi kelas atas.
+
 class AppTextStyles {
   AppTextStyles._();
 

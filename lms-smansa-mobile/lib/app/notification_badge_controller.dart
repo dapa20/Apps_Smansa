@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../core/api/api_repository.dart';
 
-/// Controller global untuk status notifikasi siswa. Dipakai oleh BerandaScreen
+
 class NotificationBadgeController extends ChangeNotifier {
   NotificationBadgeController._();
   static final NotificationBadgeController instance =

@@ -8,7 +8,6 @@ class AppConstants {
   static const String currentSemester = 'Semester Ganjil 2023/2024';
   static const String tahunAjaran = '2023/2024';
 
-  // Spacing constants (multi-4 grid)
   static const double screenPadding = 20.0;
   static const double cardPadding = 16.0;
   static const double cardRadius = 20.0;
@@ -19,14 +18,11 @@ class AppConstants {
   static const double leftBorderWidth = 4.0;
   static const double bottomNavHeight = 64.0;
 
-  // Responsive breakpoints
   static const double mobileSmall = 360.0;
   static const double mobileMedium = 480.0;
   static const double tabletSmall = 600.0;
   static const double tabletLarge = 840.0;
 
-  /// Klasifikasi lebar layar: small (phone kecil), medium (phone),
-  /// large (phone besar / phablet), extraLarge (tablet/desktop).
   static ScreenSize getScreenSize(double width) {
     if (width < mobileSmall) return ScreenSize.small;
     if (width < mobileMedium) return ScreenSize.medium;
@@ -34,7 +30,6 @@ class AppConstants {
     return ScreenSize.extraLarge;
   }
 
-  /// Padding layar yang menyesuaikan lebar device.
   static double responsivePadding(double width) {
     final size = getScreenSize(width);
     switch (size) {
@@ -49,8 +44,6 @@ class AppConstants {
     }
   }
 
-  /// Lebar maksimal konten (di atas ini akan dipusatkan + margin auto).
-  /// Berguna agar tampilan lebar seperti iPad / desktop tidak stretched.
   static const double maxContentWidth = 600.0;
 }
 
