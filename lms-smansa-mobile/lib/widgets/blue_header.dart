@@ -1,167 +1,232 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
 
-/// A reusable blue curved header used across many screens.
-/// Displays a title, optional subtitle, and optional trailing widgets.
+/// Header gradient yang dipakai hampir di seluruh halaman.
 ///
-/// Style: modern minimal dengan gradient halus (deep blue → mid blue → light),
-/// padding adaptif dengan [SafeArea] untuk notch/status bar, dan opsional
-/// glass overlay + decorative blobs untuk efek premium.
-///
-/// Tinggi [height] adalah tinggi minimum (ekspansi mengikuti konten).
+/// Desain baru: gradient navy → blue, pola garis halus, glow cyan,
+/// sudut bawah membulat, dan tombol kembali bergaya glass.
 class BlueHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
+
+  /// Label kecil di atas judul (mis. nama sekolah / kategori halaman).
+  final String? eyebrow;
   final Widget? leading;
   final Widget? trailing;
   final double height;
   final List<Widget>? extraContent;
+  final bool showBackButton;
+  final VoidCallback? onBack;
 
   const BlueHeader({
     super.key,
     required this.title,
     this.subtitle,
+    this.eyebrow,
     this.leading,
     this.trailing,
     this.height = 180,
     this.extraContent,
+    this.showBackButton = false,
+    this.onBack,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ClipPath(
-      clipper: _WavyClipper(),
-      child: Container(
-        width: double.infinity,
-        constraints: BoxConstraints(
-          minHeight: height + MediaQuery.of(context).padding.top,
-        ),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1D4ED8), // primaryBlueDark
-              Color(0xFF2563EB), // primaryBlue
-              Color(0xFF3B82F6), // lighter blue
-            ],
-            stops: [0.0, 0.55, 1.0],
+    final hasTopRow = leading != null || trailing != null || showBackButton;
+
+    return Container(
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        gradient: AppColors.heroLinear,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.navy.withValues(alpha: 0.18),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+            spreadRadius: -8,
           ),
-        ),
-        child: Stack(
-          children: [
-            // Soft glass overlay (subtle white wash) untuk efek premium
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.10),
-                        Colors.white.withValues(alpha: 0.0),
-                      ],
-                    ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Pola garis tipis + glow dekoratif.
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(painter: _HeaderPatternPainter()),
+            ),
+          ),
+          Positioned(
+            top: -110,
+            right: -80,
+            child: IgnorePointer(
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.accentCyan.withValues(alpha: 0.22),
+                      AppColors.accentCyan.withValues(alpha: 0.0),
+                    ],
                   ),
                 ),
               ),
             ),
-            // ─── Decorative blobs (3 lingkaran pudar tumpang tindih) ─
-            // Pattern referensi: 3 blob overlap membentuk pola premium.
-            // Blob 1 — besar kanan-atas (overflow keluar header)
-            Positioned(
-              top: -100,
-              right: -80,
+          ),
+          Positioned(
+            bottom: -140,
+            left: -70,
+            child: IgnorePointer(
               child: Container(
-                width: 320,
-                height: 320,
+                width: 300,
+                height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.14),
+                  color: Colors.white.withValues(alpha: 0.05),
                 ),
               ),
             ),
-            // Blob 2 — medium kiri-tengah, overlap dengan blob 1
-            Positioned(
-              top: 40,
-              left: -120,
-              child: Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.10),
-                ),
-              ),
-            ),
-            // Blob 3 — besar kanan-tengah, overlap dengan blob 1
-            Positioned(
-              top: 30,
-              right: -40,
-              child: Container(
-                width: 220,
-                height: 220,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-            ),
-            // Konten utama: pakai SafeArea untuk hindarin overlap notch.
-            SafeArea(
-              bottom: false,
+          ),
+          SafeArea(
+            bottom: false,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: height),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (leading != null || trailing != null)
+                    if (hasTopRow) ...[
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          leading ?? const SizedBox.shrink(),
-                          trailing ?? const SizedBox.shrink(),
+                          if (showBackButton)
+                            _GlassBackButton(onPressed: onBack),
+                          ?leading,
+                          const Spacer(),
+                          ?trailing,
                         ],
                       ),
-                    if (leading != null || trailing != null)
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 20),
+                    ],
+                    if (eyebrow != null) ...[
+                      Text(
+                        eyebrow!.toUpperCase(),
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white.withValues(alpha: 0.55),
+                          letterSpacing: 1.6,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                     if (title.isNotEmpty)
-                      Text(title, style: AppTextStyles.headerTitle),
+                      Text(
+                        title,
+                        style: AppTextStyles.headerTitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     if (subtitle != null) ...[
-                      if (title.isNotEmpty) const SizedBox(height: 6),
+                      if (title.isNotEmpty) const SizedBox(height: 8),
                       Text(
                         subtitle!,
                         style: AppTextStyles.headerSubtitle,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    if (extraContent != null) ...extraContent!,
+                    ...?extraContent,
                   ],
                 ),
               ),
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlassBackButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+
+  const _GlassBackButton({this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap:
+            onPressed ??
+            () {
+              final navigator = Navigator.of(context);
+              if (navigator.canPop()) navigator.pop();
+            },
+        child: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withValues(alpha: 0.12),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1,
+            ),
+          ),
+          child: const Icon(
+            Icons.arrow_back_rounded,
+            color: Colors.white,
+            size: 21,
+          ),
         ),
       ),
     );
   }
 }
 
-class _WavyClipper extends CustomClipper<Path> {
+class _HeaderPatternPainter extends CustomPainter {
   @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, size.height - 30);
-    path.quadraticBezierTo(
-      size.width / 2, size.height + 10,
-      size.width, size.height - 30,
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.045)
+      ..strokeWidth = 1;
+
+    // Garis vertikal halus.
+    for (double x = 24; x < size.width; x += 44) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), linePaint);
+    }
+
+    // Garis horizontal halus.
+    for (double y = 28; y < size.height; y += 44) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
+    }
+
+    // Lingkaran outline besar di kanan bawah.
+    final circlePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = Colors.white.withValues(alpha: 0.07);
+    canvas.drawCircle(
+      Offset(size.width * 0.92, size.height * 0.72),
+      size.width * 0.32,
+      circlePaint,
     );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
+    canvas.drawCircle(
+      Offset(size.width * 0.92, size.height * 0.72),
+      size.width * 0.22,
+      circlePaint,
+    );
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

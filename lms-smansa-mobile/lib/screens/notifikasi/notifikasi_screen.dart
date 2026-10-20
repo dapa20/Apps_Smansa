@@ -5,6 +5,8 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
+import '../../widgets/surface_card.dart';
+import '../../widgets/state_views.dart';
 import '../../app/notification_badge_controller.dart';
 
 class NotifikasiScreen extends StatefulWidget {
@@ -50,9 +52,43 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final list = _pengumuman ?? [];
+
     return Column(
       children: [
-        const BlueHeader(title: 'Notifikasi', subtitle: 'Pengumuman terbaru untukmu'),
+        BlueHeader(
+          eyebrow: 'Pusat Informasi',
+          title: 'Notifikasi',
+          subtitle: 'Semua kabar terbaru untukmu, di satu tempat.',
+          height: 150,
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.mark_email_read_rounded,
+                  color: Colors.white,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  _loading ? 'Memuat' : '${list.length} pesan',
+                  style: AppTextStyles.caption.copyWith(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         Expanded(child: _buildBody()),
       ],
     );
@@ -60,90 +96,67 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: AppColors.primaryBlue,
-        ),
-      );
+      return const AppLoadingView(message: 'Memuat notifikasi...');
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.cloud_off_rounded,
-                  size: 36,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodySecondary,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(onPressed: _load, child: const Text('Coba Lagi')),
-            ],
-          ),
-        ),
-      );
+      return AppErrorView(message: _error!, onRetry: _load);
     }
 
     final list = _pengumuman ?? [];
     if (list.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.notifications_off_rounded,
-                size: 40,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Belum ada notifikasi',
-              style: AppTextStyles.cardTitle,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Notifikasi baru akan muncul di sini',
-              style: AppTextStyles.smallText,
-            ),
-          ],
-        ),
+      return const AppEmptyView(
+        icon: Icons.notifications_off_rounded,
+        title: 'Belum ada notifikasi',
+        subtitle: 'Notifikasi baru akan muncul di sini.',
       );
     }
 
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppConstants.responsivePadding(MediaQuery.of(context).size.width),
-        vertical: 20,
+    return RefreshIndicator(
+      onRefresh: _load,
+      color: AppColors.primaryBlue,
+      backgroundColor: Colors.white,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          AppConstants.responsivePadding(MediaQuery.of(context).size.width),
+          20,
+          AppConstants.responsivePadding(MediaQuery.of(context).size.width),
+          28,
+        ),
+        children: [
+          Row(
+            children: [
+              Text('Terbaru', style: AppTextStyles.sectionTitle),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueTint,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '${list.length}',
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primaryBlue,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'Dibaca otomatis',
+                style: AppTextStyles.caption.copyWith(fontSize: 9.5),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          for (int i = 0; i < list.length; i++) ...[
+            _buildNotifCard(list[i]),
+            if (i != list.length - 1) const SizedBox(height: 10),
+          ],
+        ],
       ),
-      itemCount: list.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) => _buildNotifCard(list[index]),
     );
   }
 
@@ -152,79 +165,63 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
     final waktuRaw = notif['created_at'] as String?;
     final waktu = waktuRaw != null ? DateTime.tryParse(waktuRaw) : null;
 
-    IconData icon;
-    Color iconColor;
-    Color iconBg;
+    final style = _styleFor(tipe);
 
-    switch (tipe.toLowerCase()) {
-      case 'tugas':
-        icon = Icons.assignment_rounded;
-        iconColor = AppColors.primaryBlue;
-        iconBg = AppColors.chipBlueBg;
-        break;
-      case 'nilai':
-        icon = Icons.stars_rounded;
-        iconColor = AppColors.chipGreenText;
-        iconBg = AppColors.chipGreenBg;
-        break;
-      case 'pengumuman':
-      case 'penting':
-        icon = Icons.campaign_rounded;
-        iconColor = AppColors.chipYellowText;
-        iconBg = AppColors.chipYellowBg;
-        break;
-      case 'kehadiran':
-        icon = Icons.fact_check_rounded;
-        iconColor = AppColors.chipPurpleText;
-        iconBg = AppColors.chipPurpleBg;
-        break;
-      default:
-        icon = Icons.notifications_rounded;
-        iconColor = AppColors.textSecondary;
-        iconBg = AppColors.surfaceMuted;
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+    return SurfaceCard(
+      padding: const EdgeInsets.all(15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-            child: Icon(icon, color: iconColor, size: 22),
+          AppIconTile(
+            icon: style.icon,
+            color: style.color,
+            size: 46,
+            iconSize: 21,
+            radius: 14,
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 13),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(notif['judul'] ?? '-', style: AppTextStyles.cardTitle),
-                const SizedBox(height: 4),
-                Text(
-                  notif['isi'] ?? '',
-                  style: AppTextStyles.bodySecondary,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: style.color.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        style.label,
+                        style: AppTextStyles.chipText.copyWith(
+                          color: style.color,
+                          fontSize: 8.5,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      waktu != null ? _formatWaktu(waktu) : '',
+                      style: AppTextStyles.caption.copyWith(fontSize: 9.5),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  waktu != null ? _formatWaktu(waktu) : '',
-                  style: AppTextStyles.caption,
+                  notif['judul'] ?? '-',
+                  style: AppTextStyles.cardTitle.copyWith(fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  notif['isi'] ?? '',
+                  style: AppTextStyles.bodySecondary.copyWith(fontSize: 12.5),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -234,18 +231,66 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
     );
   }
 
+  _NotifStyle _styleFor(String tipe) {
+    switch (tipe.toLowerCase()) {
+      case 'tugas':
+        return const _NotifStyle(
+          icon: Icons.assignment_rounded,
+          color: AppColors.primaryBlue,
+          label: 'TUGAS',
+        );
+      case 'nilai':
+        return const _NotifStyle(
+          icon: Icons.stars_rounded,
+          color: AppColors.accentMint,
+          label: 'NILAI',
+        );
+      case 'pengumuman':
+      case 'penting':
+        return const _NotifStyle(
+          icon: Icons.campaign_rounded,
+          color: AppColors.accentAmber,
+          label: 'PENGUMUMAN',
+        );
+      case 'kehadiran':
+        return const _NotifStyle(
+          icon: Icons.fact_check_rounded,
+          color: AppColors.accentPurple,
+          label: 'KEHADIRAN',
+        );
+      default:
+        return const _NotifStyle(
+          icon: Icons.notifications_rounded,
+          color: AppColors.textSecondary,
+          label: 'INFO',
+        );
+    }
+  }
+
   String _formatWaktu(DateTime time) {
     final now = DateTime.now();
     final diff = now.difference(time);
 
     if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} menit yang lalu';
+      return '${diff.inMinutes} menit lalu';
     } else if (diff.inHours < 24) {
-      return '${diff.inHours} jam yang lalu';
+      return '${diff.inHours} jam lalu';
     } else if (diff.inDays < 7) {
-      return '${diff.inDays} hari yang lalu';
+      return '${diff.inDays} hari lalu';
     } else {
-      return DateFormat('dd MMM yyyy, HH:mm').format(time);
+      return DateFormat('dd MMM yyyy').format(time);
     }
   }
+}
+
+class _NotifStyle {
+  final IconData icon;
+  final Color color;
+  final String label;
+
+  const _NotifStyle({
+    required this.icon,
+    required this.color,
+    required this.label,
+  });
 }

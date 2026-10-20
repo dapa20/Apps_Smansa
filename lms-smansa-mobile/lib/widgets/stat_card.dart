@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
-import '../core/constants/app_constants.dart';
+import 'surface_card.dart';
 
-/// Stat card modern minimal: background putih dengan border tipis 1px,
-/// tanpa shadow berat. Mendukung optional left border accent untuk highlight.
+/// Stat card dengan ikon berwarna, label kecil, dan angka besar.
 class StatCard extends StatelessWidget {
   final String label;
   final String value;
   final bool showLeftBorder;
   final Color? accentColor;
   final IconData? icon;
+  final String? suffix;
 
   const StatCard({
     super.key,
@@ -19,71 +19,85 @@ class StatCard extends StatelessWidget {
     this.showLeftBorder = false,
     this.accentColor,
     this.icon,
+    this.suffix,
   });
 
   @override
   Widget build(BuildContext context) {
     final accent = accentColor ?? AppColors.leftBorderBlue;
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 1),
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Row(
+
+    return SurfaceCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (showLeftBorder)
-            Container(
-              width: AppConstants.leftBorderWidth,
-              height: 36,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: accent,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          if (icon != null) ...[
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: accent, size: 20),
-            ),
-            const SizedBox(width: 12),
-          ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+          Row(
+            children: [
+              if (icon != null)
+                AppIconTile(
+                  icon: icon!,
+                  color: accent,
+                  size: 36,
+                  iconSize: 19,
+                  radius: 11,
                 ),
-                const SizedBox(height: 4),
-                Text(
+              const Spacer(),
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.45),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.eyebrow.copyWith(
+              color: AppColors.textTertiary,
+              fontSize: 9.5,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Flexible(
+                child: Text(
                   value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.bigNumber.copyWith(
-                    fontSize: 22,
+                    fontSize: 24,
                     color: AppColors.textPrimary,
                   ),
                 ),
+              ),
+              if (suffix != null) ...[
+                const SizedBox(width: 4),
+                Text(
+                  suffix!,
+                  style: AppTextStyles.smallText.copyWith(
+                    color: accent,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
         ],
       ),

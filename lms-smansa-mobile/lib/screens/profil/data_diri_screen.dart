@@ -3,8 +3,10 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/api/api_repository.dart';
 import '../../core/api/auth_service.dart';
-import '../../widgets/back_button_overlay.dart';
+import '../../widgets/blue_header.dart';
 import '../../widgets/responsive_container.dart';
+import '../../widgets/surface_card.dart';
+import '../../widgets/state_views.dart';
 
 class DataDiriScreen extends StatefulWidget {
   const DataDiriScreen({super.key});
@@ -69,249 +71,270 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryBlue,
-        leading: const BackLeadingButton(color: Colors.white),
-        title: Text(
-          'Data Diri',
-          style: AppTextStyles.headerTitle.copyWith(fontSize: 18),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
       body: _loading && _siswa == null
-          ? const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.primaryBlue,
-              ),
+          ? Column(
+              children: [
+                BlueHeader(
+                  eyebrow: 'Identitas Siswa',
+                  title: 'Data Diri',
+                  subtitle: 'Informasi lengkap akun siswamu.',
+                  height: 110,
+                  showBackButton: true,
+                ),
+                const Expanded(
+                  child: AppLoadingView(message: 'Memuat data diri...'),
+                ),
+              ],
             )
           : _error != null && _siswa == null
-              ? _buildErrorState()
-              : RefreshIndicator(
-                  onRefresh: _load,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: ResponsivePadding(
-                      verticalPadding:
-                          const EdgeInsets.symmetric(vertical: 20),
+          ? Column(
+              children: [
+                BlueHeader(
+                  eyebrow: 'Identitas Siswa',
+                  title: 'Data Diri',
+                  subtitle: 'Informasi lengkap akun siswamu.',
+                  height: 110,
+                  showBackButton: true,
+                ),
+                Expanded(
+                  child: AppErrorView(message: _error!, onRetry: _load),
+                ),
+              ],
+            )
+          : RefreshIndicator(
+              onRefresh: _load,
+              color: AppColors.primaryBlue,
+              backgroundColor: Colors.white,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BlueHeader(
+                      eyebrow: 'Identitas Siswa',
+                      title: 'Data Diri',
+                      subtitle: 'Informasi lengkap akun siswamu.',
+                      height: 110,
+                      showBackButton: true,
+                      extraContent: [
+                        const SizedBox(height: 20),
+                        _buildIdentityHero(),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    ResponsivePadding(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildProfileCard(),
-                          const SizedBox(height: 16),
                           _buildIdentityCard(),
                           const SizedBox(height: 16),
                           _buildKehadiranCard(),
+                          const SizedBox(height: 28),
                         ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
+            ),
     );
   }
 
-  Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.cloud_off_rounded,
-                size: 36,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _error!,
-              textAlign: TextAlign.center,
-              style: AppTextStyles.bodySecondary,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _load,
-              child: const Text('Coba Lagi'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileCard() {
+  Widget _buildIdentityHero() {
     final siswa = _siswa ?? {};
-    final nis = siswa['nis'] ?? '-';
-    final nisn = siswa['nisn'] ?? '-';
-    final nama = siswa['nama_lengkap'] ?? 'Siswa';
-    final kelas = siswa['nama_kelas'] ?? '-';
+    final nama = siswa['nama_lengkap']?.toString() ?? 'Siswa';
+    final kelas = siswa['nama_kelas']?.toString() ?? '-';
+    final nis = siswa['nis']?.toString() ?? '-';
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1D4ED8),
-            Color(0xFF2563EB),
-            Color(0xFF3B82F6),
-          ],
-          stops: [0.0, 0.55, 1.0],
+        color: Colors.white.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.16),
+          width: 1,
         ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryBlue.withValues(alpha: 0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-            spreadRadius: -4,
-          ),
-        ],
       ),
-      child: Column(
+      child: Row(
         children: [
           Container(
-            width: 84,
-            height: 84,
+            width: 54,
+            height: 54,
             decoration: BoxDecoration(
-              color: Colors.white,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 4),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.white, Color(0xFFDCE9FF)],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.5),
+                width: 2,
+              ),
             ),
-            child: const Icon(
-              Icons.person_rounded,
-              size: 44,
-              color: AppColors.primaryBlue,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            nama,
-            style: AppTextStyles.headerTitle.copyWith(fontSize: 20),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: AppColors.accentYellow,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              kelas.toString().toUpperCase(),
-              style: AppTextStyles.chipText.copyWith(color: Colors.white),
+            child: Center(
+              child: Text(
+                _initials(nama),
+                style: AppTextStyles.cardTitle.copyWith(
+                  color: AppColors.primaryBlue,
+                  fontSize: 17,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 16,
-            runSpacing: 4,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.badge_outlined,
-                    size: 14,
-                    color: Colors.white70,
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nama,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.3,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'NIS: $nis',
-                    style: AppTextStyles.caption.copyWith(
-                      color: Colors.white70,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        kelas.toUpperCase(),
+                        style: AppTextStyles.chipText.copyWith(
+                          color: Colors.white,
+                          fontSize: 8,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Text(
-                'NISN: $nisn',
-                style: AppTextStyles.caption.copyWith(color: Colors.white70),
-              ),
-            ],
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'NIS $nis',
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white.withValues(alpha: 0.62),
+                          fontSize: 9.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.verified_rounded,
+            color: AppColors.accentCyan,
+            size: 22,
           ),
         ],
       ),
     );
+  }
+
+  String _initials(String nama) {
+    final parts = nama
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (parts.isEmpty) return 'S';
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    return (parts.first.substring(0, 1) + parts[1].substring(0, 1))
+        .toUpperCase();
   }
 
   Widget _buildIdentityCard() {
     final siswa = _siswa ?? {};
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+
+    final rows = <Map<String, String>>[
+      {'label': 'NIS', 'value': siswa['nis']?.toString() ?? '-'},
+      {'label': 'NISN', 'value': siswa['nisn']?.toString() ?? '-'},
+      {
+        'label': 'Nama Lengkap',
+        'value': siswa['nama_lengkap']?.toString() ?? '-',
+      },
+      {
+        'label': 'Jenis Kelamin',
+        'value': _jenisKelamin(siswa['jenis_kelamin'] as String?),
+      },
+      {'label': 'Kelas', 'value': siswa['nama_kelas']?.toString() ?? '-'},
+      {'label': 'Tingkat', 'value': siswa['tingkat']?.toString() ?? '-'},
+      {'label': 'Program', 'value': siswa['program']?.toString() ?? '-'},
+      {
+        'label': 'Tahun Ajaran',
+        'value': siswa['tahun_ajaran']?.toString() ?? '-',
+      },
+      {'label': 'Wali Kelas', 'value': siswa['wali_kelas']?.toString() ?? '-'},
+      {
+        'label': 'Status',
+        'value': (siswa['status']?.toString() ?? '-').toUpperCase(),
+      },
+    ];
+
+    return SurfaceCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlueTint,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.person_outline_rounded,
-                  color: AppColors.primaryBlue,
-                  size: 22,
+              const AppIconTile(
+                icon: Icons.person_outline_rounded,
+                color: AppColors.primaryBlue,
+                size: 40,
+                iconSize: 19,
+                radius: 12,
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Identitas Siswa',
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 14),
+                    ),
+                    Text(
+                      'Data resmi yang tercatat di sekolah',
+                      style: AppTextStyles.smallText.copyWith(fontSize: 10.5),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
-              Text('Identitas Siswa', style: AppTextStyles.cardTitle),
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(color: AppColors.divider, height: 1),
-          _buildDataRow('NIS', siswa['nis']?.toString() ?? '-'),
-          _buildDataRow('NISN', siswa['nisn']?.toString() ?? '-'),
-          _buildDataRow(
-            'Nama Lengkap',
-            siswa['nama_lengkap']?.toString() ?? '-',
-          ),
-          _buildDataRow(
-            'Jenis Kelamin',
-            _jenisKelamin(siswa['jenis_kelamin'] as String?),
-          ),
-          _buildDataRow('Kelas', siswa['nama_kelas']?.toString() ?? '-'),
-          _buildDataRow('Tingkat', siswa['tingkat']?.toString() ?? '-'),
-          _buildDataRow('Program', siswa['program']?.toString() ?? '-'),
-          _buildDataRow(
-            'Tahun Ajaran',
-            siswa['tahun_ajaran']?.toString() ?? '-',
-          ),
-          _buildDataRow(
-            'Wali Kelas',
-            siswa['wali_kelas']?.toString() ?? '-',
-          ),
-          _buildDataRow(
-            'Status',
-            (siswa['status']?.toString() ?? '-').toUpperCase(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Column(
+              children: [
+                for (int i = 0; i < rows.length; i++) ...[
+                  _buildDataRow(rows[i]['label']!, rows[i]['value']!),
+                  if (i != rows.length - 1)
+                    const Divider(height: 1, color: AppColors.divider),
+                ],
+              ],
+            ),
           ),
         ],
       ),
@@ -326,103 +349,162 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
     final sakit = k['sakit'] ?? 0;
     final alpa = k['alpa'] ?? 0;
     final persen = (k['persen_hadir'] ?? 0).toString();
+    final progress = ((double.tryParse(persen) ?? 0) / 100).clamp(0.0, 1.0);
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+    return SurfaceCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.chipGreenBg,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.fact_check_rounded,
-                  color: AppColors.chipGreenText,
-                  size: 22,
+              const AppIconTile(
+                icon: Icons.fact_check_rounded,
+                color: AppColors.accentMint,
+                size: 40,
+                iconSize: 19,
+                radius: 12,
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ringkasan Kehadiran',
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 14),
+                    ),
+                    Text(
+                      'Total $total pertemuan tercatat',
+                      style: AppTextStyles.smallText.copyWith(fontSize: 10.5),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
-              Text('Ringkasan Kehadiran', style: AppTextStyles.cardTitle),
+              Text(
+                '$persen%',
+                style: AppTextStyles.bigNumber.copyWith(
+                  fontSize: 20,
+                  color: AppColors.accentMint,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          const Divider(color: AppColors.divider, height: 1),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStat('Hadir', '$hadir', AppColors.chipGreenText),
-              _buildStat('Izin', '$izin', AppColors.chipBlueText),
-              _buildStat('Sakit', '$sakit', AppColors.chipYellowText),
-              _buildStat('Alpa', '$alpa', AppColors.chipRedText),
+              Expanded(
+                child: _buildMiniStat(
+                  'Hadir',
+                  '$hadir',
+                  AppColors.accentMint,
+                  AppColors.chipGreenBg,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStat(
+                  'Izin',
+                  '$izin',
+                  AppColors.primaryBlue,
+                  AppColors.chipBlueBg,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStat(
+                  'Sakit',
+                  '$sakit',
+                  AppColors.accentAmber,
+                  AppColors.chipYellowBg,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStat(
+                  'Alpa',
+                  '$alpa',
+                  AppColors.dangerRed,
+                  AppColors.chipRedBg,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppColors.primaryBlueTint,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Persentase Kehadiran',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.primaryBlue,
-                  ),
-                ),
-                Text(
-                  '$persen%',
-                  style: AppTextStyles.cardTitle.copyWith(
-                    color: AppColors.primaryBlue,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceMuted,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.accentMint,
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Total $total pertemuan tercatat',
-            style: AppTextStyles.caption,
-            textAlign: TextAlign.center,
+          const SizedBox(height: 9),
+          Row(
+            children: [
+              Text(
+                'Kehadiran semester ini',
+                style: AppTextStyles.caption.copyWith(fontSize: 9.5),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.verified_rounded,
+                size: 12,
+                color: progress >= 0.75
+                    ? AppColors.accentMint
+                    : AppColors.accentAmber,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                progress >= 0.75 ? 'Sangat baik' : 'Perlu ditingkatkan',
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: 9.5,
+                  color: progress >= 0.75
+                      ? AppColors.accentMint
+                      : AppColors.accentAmber,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStat(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: AppTextStyles.cardTitle.copyWith(color: color, fontSize: 22),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: AppTextStyles.smallText),
-      ],
+  Widget _buildMiniStat(
+    String label,
+    String value,
+    Color color,
+    Color background,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: background.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: color.withValues(alpha: 0.10)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: AppTextStyles.cardTitle.copyWith(color: color, fontSize: 17),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              color: color.withValues(alpha: 0.75),
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -438,15 +520,19 @@ class _DataDiriScreenState extends State<DataDiriScreen> {
               label,
               style: AppTextStyles.smallText.copyWith(
                 color: AppColors.textSecondary,
+                fontSize: 11.5,
               ),
             ),
           ),
+          const SizedBox(width: 12),
           Expanded(
             flex: 6,
             child: Text(
               value,
+              textAlign: TextAlign.right,
               style: AppTextStyles.bodyText.copyWith(
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
+                fontSize: 12.5,
               ),
             ),
           ),

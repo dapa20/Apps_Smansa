@@ -5,7 +5,8 @@ import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/section_header.dart';
-import '../../widgets/back_button_overlay.dart';
+import '../../widgets/surface_card.dart';
+import '../../widgets/state_views.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -65,127 +66,191 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
+      body: RefreshIndicator(
+        onRefresh: _load,
+        color: AppColors.primaryBlue,
         backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: const BackLeadingButton(),
-        title: Text(
-          AppConstants.appName,
-          style: AppTextStyles.headerTitle.copyWith(
-            color: AppColors.primaryBlue,
-            fontSize: 18,
-          ),
-        ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const BlueHeader(
-                  title: 'Riwayat Akademik',
-                  subtitle: 'Pantau perkembangan nilai dan prestasimu',
-                  height: 180,
-                ),
-                Positioned(
-                  bottom: -30,
-                  left: 20,
-                  right: 20,
-                  child: _buildSummaryCard(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 50),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'Pilih Semester',
-                style: AppTextStyles.sectionTitle,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const BlueHeader(
+                eyebrow: 'Pencapaian Belajar',
+                title: 'Riwayat Akademik',
+                subtitle: 'Pantau perkembangan nilai dan prestasimu.',
+                height: 104,
+                showBackButton: true,
               ),
-            ),
-            const SizedBox(height: 12),
-            _buildSemesterSelector(),
-
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildRingkasanSemester(),
-            ),
-
-            const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: SectionHeader(title: 'Detail Nilai Mata Pelajaran'),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildNilaiList(),
-            ),
-            const SizedBox(height: 40),
-          ],
+              const SizedBox(height: 18),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppConstants.responsivePadding(
+                    MediaQuery.of(context).size.width,
+                  ),
+                ),
+                child: _buildSummaryCard(),
+              ),
+              const SizedBox(height: 22),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppConstants.responsivePadding(
+                    MediaQuery.of(context).size.width,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text('Semester', style: AppTextStyles.sectionTitle),
+                    const Spacer(),
+                    Text(
+                      'Pilih periode',
+                      style: AppTextStyles.caption.copyWith(fontSize: 9.5),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              _buildSemesterSelector(),
+              const SizedBox(height: 22),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppConstants.responsivePadding(
+                    MediaQuery.of(context).size.width,
+                  ),
+                ),
+                child: _buildRingkasanSemester(),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppConstants.responsivePadding(
+                    MediaQuery.of(context).size.width,
+                  ),
+                ),
+                child: const SectionHeader(
+                  title: 'Detail Nilai',
+                  subtitle: 'Nilai per mata pelajaran',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppConstants.responsivePadding(
+                    MediaQuery.of(context).size.width,
+                  ),
+                ),
+                child: _buildNilaiList(),
+              ),
+              const SizedBox(height: 38),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildSummaryCard() {
+    final rata = (_data?['rata_rata'] ?? 0).toString();
+    final jumlahMapel = _data?['jumlah_mapel'] ?? 0;
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0B1B45), Color(0xFF1D4ED8)],
+        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 4),
-            blurRadius: 14,
-            spreadRadius: -2,
+            color: AppColors.navy.withValues(alpha: 0.22),
+            blurRadius: 26,
+            offset: const Offset(0, 12),
+            spreadRadius: -10,
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Positioned(
+            top: -50,
+            right: -40,
+            child: Container(
+              width: 160,
+              height: 160,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.accentCyan.withValues(alpha: 0.10),
+              ),
+            ),
+          ),
+          Row(
             children: [
-              Text(
-                'Rata-rata Semester',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'RATA-RATA SEMESTER',
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white.withValues(alpha: 0.55),
+                        fontSize: 8.5,
+                        letterSpacing: 1.4,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          rata,
+                          style: AppTextStyles.bigNumber.copyWith(
+                            color: Colors.white,
+                            fontSize: 36,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '/ 100',
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$jumlahMapel mata pelajaran',
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white.withValues(alpha: 0.62),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                (_data?['rata_rata'] ?? '0').toString(),
-                style: AppTextStyles.bigNumber,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${_data?['jumlah_mapel'] ?? 0} Mata Pelajaran',
-                style: AppTextStyles.smallText,
+              Container(
+                width: 66,
+                height: 66,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.10),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.18),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.insights_rounded,
+                  color: AppColors.accentCyan,
+                  size: 30,
+                ),
               ),
             ],
-          ),
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppColors.primaryBlueTint,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.trending_up_rounded,
-              color: AppColors.primaryBlue,
-              size: 28,
-            ),
           ),
         ],
       ),
@@ -193,16 +258,73 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   }
 
   Widget _buildSemesterSelector() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.responsivePadding(
+          MediaQuery.of(context).size.width,
+        ),
+      ),
       child: Row(
         children: List.generate(_semesters.length, (index) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: _buildSemesterPill(
-              'Semester ${_semesters[index]}',
-              index == _semesterIndex,
+          final isActive = index == _semesterIndex;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => _changeSemester(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: EdgeInsets.only(right: index == 0 ? 8 : 0),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                decoration: BoxDecoration(
+                  color: isActive ? Colors.white : AppColors.surfaceAlt,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isActive
+                        ? AppColors.primaryBlue.withValues(alpha: 0.28)
+                        : AppColors.borderSubtle,
+                    width: isActive ? 1.3 : 1,
+                  ),
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primaryBlue.withValues(
+                              alpha: 0.10,
+                            ),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                            spreadRadius: -6,
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? AppColors.primaryBlue
+                            : AppColors.textTertiary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 7),
+                    Text(
+                      'Semester ${_semesters[index]}',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: isActive
+                            ? AppColors.primaryBlue
+                            : AppColors.textSecondary,
+                        fontWeight: isActive
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         }),
@@ -210,123 +332,62 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     );
   }
 
-  Widget _buildSemesterPill(String text, bool isActive) {
-    return GestureDetector(
-      onTap: () => _changeSemester(
-        isActive ? _semesterIndex : _semesters.indexOf(text.split(' ').last),
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.primaryBlue : Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: isActive ? AppColors.primaryBlue : AppColors.borderSubtle,
-          ),
-        ),
-        child: Text(
-          text,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: isActive ? Colors.white : AppColors.textPrimary,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            fontSize: 13,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildRingkasanSemester() {
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: AppColors.primaryBlue,
-          ),
-        ),
+      return const AppLoadingView(
+        message: 'Memuat nilai semester...',
+        compact: true,
       );
     }
 
     if (_error != null) {
-      return Column(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.cloud_off_rounded,
-              size: 32,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _error!,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodySecondary,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(onPressed: _load, child: const Text('Coba Lagi')),
-        ],
-      );
+      return AppErrorView(message: _error!, onRetry: _load);
     }
 
     final rataRata = ((_data?['rata_rata'] ?? 0.0) as num).toDouble();
     final target = 75.0;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+    return SurfaceCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Ringkasan Semester $_selectedSemester',
-                style: AppTextStyles.cardTitle,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ringkasan Semester $_selectedSemester',
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 14),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${_data?['tahun_ajaran'] ?? '-'}',
+                      style: AppTextStyles.smallText.copyWith(fontSize: 10.5),
+                    ),
+                  ],
+                ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.chipYellowBg,
                   borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: AppColors.accentAmber.withValues(alpha: 0.16),
+                  ),
                 ),
                 child: Text(
                   'IPS',
                   style: AppTextStyles.chipText.copyWith(
                     color: AppColors.chipYellowText,
+                    fontSize: 8.5,
                   ),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${_data?['tahun_ajaran'] ?? '-'}',
-            style: AppTextStyles.bodySecondary,
           ),
           const SizedBox(height: 16),
           Row(
@@ -335,71 +396,62 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
               Text(
                 rataRata.toString(),
                 style: AppTextStyles.bigNumber.copyWith(
-                  color: AppColors.accentYellow,
+                  color: AppColors.accentAmber,
+                  fontSize: 32,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 7),
               Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text('/ 100', style: AppTextStyles.bodySecondary),
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '/ 100',
+                  style: AppTextStyles.smallText.copyWith(fontSize: 10.5),
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: rataRata >= target
+                      ? AppColors.chipGreenBg
+                      : AppColors.chipRedBg,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  rataRata >= target ? 'Tercapai' : 'Belum',
+                  style: AppTextStyles.chipText.copyWith(
+                    color: rataRata >= target
+                        ? AppColors.chipGreenText
+                        : AppColors.chipRedText,
+                    fontSize: 8.5,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Stack(
-            children: [
-              Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+          const SizedBox(height: 13),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: (rataRata / 100).clamp(0.0, 1.0),
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceMuted,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.accentAmber,
               ),
-              FractionallySizedBox(
-                widthFactor: (rataRata / 100).clamp(0.0, 1.0),
-                child: Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: AppColors.accentYellow,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: (target / 100).clamp(0.0, 1.0),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppColors.textPrimary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Target: $target', style: AppTextStyles.smallText),
               Text(
-                rataRata >= target ? 'Tercapai' : 'Belum',
-                style: AppTextStyles.smallText.copyWith(
-                  color: rataRata >= target
-                      ? AppColors.chipGreenText
-                      : AppColors.chipRedText,
-                  fontWeight: FontWeight.w600,
-                ),
+                'Target: ${target.toStringAsFixed(0)}',
+                style: AppTextStyles.caption.copyWith(fontSize: 9.5),
+              ),
+              const Spacer(),
+              Text(
+                '${((rataRata / target) * 100).clamp(0, 999).toStringAsFixed(0)}% dari target',
+                style: AppTextStyles.caption.copyWith(fontSize: 9.5),
               ),
             ],
           ),
@@ -415,22 +467,20 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
     final daftarNilai = (_data?['daftar_nilai'] as List?) ?? [];
     if (daftarNilai.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Center(
-          child: Text(
-            'Belum ada nilai untuk semester ini.',
-            style: AppTextStyles.bodySecondary,
-          ),
-        ),
+      return const AppEmptyView(
+        icon: Icons.grading_rounded,
+        title: 'Belum ada nilai',
+        subtitle: 'Belum ada nilai untuk semester ini.',
       );
     }
 
     return Column(
-      children: daftarNilai.map((item) {
-        final nilai = item as Map<String, dynamic>;
-        return _buildNilaiCard(nilai);
-      }).toList(),
+      children: [
+        for (int i = 0; i < daftarNilai.length; i++) ...[
+          _buildNilaiCard(daftarNilai[i] as Map<String, dynamic>),
+          if (i != daftarNilai.length - 1) const SizedBox(height: 10),
+        ],
+      ],
     );
   }
 
@@ -438,106 +488,129 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     final namaMapel = nilai['nama_mapel'] ?? '-';
     final nilaiAkhir = (nilai['nilai_akhir'] ?? 0.0).toString();
 
-    String hurufMutu = '-';
     final na = (nilai['nilai_akhir'] ?? 0.0) as num;
+    String hurufMutu;
+    Color gradeColor;
     if (na >= 90) {
       hurufMutu = 'A';
+      gradeColor = AppColors.accentMint;
     } else if (na >= 80) {
       hurufMutu = 'B';
+      gradeColor = AppColors.primaryBlue;
     } else if (na >= 70) {
       hurufMutu = 'C';
+      gradeColor = AppColors.accentAmber;
     } else if (na >= 60) {
       hurufMutu = 'D';
+      gradeColor = AppColors.accentPurple;
     } else {
       hurufMutu = 'E';
+      gradeColor = AppColors.dangerRed;
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+    return SurfaceCard(
+      padding: const EdgeInsets.all(15),
       child: Column(
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlueTint,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.functions_rounded,
-                  color: AppColors.primaryBlue,
-                  size: 24,
+              AppIconTile(
+                icon: Icons.menu_book_rounded,
+                color: gradeColor,
+                size: 42,
+                iconSize: 20,
+                radius: 12,
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  namaMapel,
+                  style: AppTextStyles.cardTitle.copyWith(fontSize: 13.5),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(namaMapel, style: AppTextStyles.cardTitle),
-                    const SizedBox(height: 4),
-                    Text(
-                      'T1: ${nilai['tugas_1'] ?? '-'} • T2: ${nilai['tugas_2'] ?? '-'} • UTS: ${nilai['uts'] ?? '-'} • UAS: ${nilai['uas'] ?? '-'}',
-                      style: AppTextStyles.bodySecondary,
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    nilaiAkhir,
+                    style: AppTextStyles.bigNumber.copyWith(
+                      fontSize: 22,
+                      color: gradeColor,
                     ),
-                  ],
+                  ),
+                  Text(
+                    'Nilai akhir',
+                    style: AppTextStyles.caption.copyWith(fontSize: 8),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: gradeColor.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: gradeColor.withValues(alpha: 0.16)),
+                ),
+                child: Text(
+                  hurufMutu,
+                  style: AppTextStyles.letterGrade.copyWith(
+                    fontSize: 14,
+                    color: gradeColor,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          const Divider(height: 1, color: AppColors.divider),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Nilai Akhir', style: AppTextStyles.bodyMedium),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    nilaiAkhir,
-                    style: AppTextStyles.bigNumber.copyWith(fontSize: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppColors.chipYellowBg,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      hurufMutu,
-                      style: AppTextStyles.letterGrade.copyWith(fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Row(
+              children: [
+                _buildScoreItem('T1', '${nilai['tugas_1'] ?? '-'}'),
+                _buildScoreDivider(),
+                _buildScoreItem('T2', '${nilai['tugas_2'] ?? '-'}'),
+                _buildScoreDivider(),
+                _buildScoreItem('UTS', '${nilai['uts'] ?? '-'}'),
+                _buildScoreDivider(),
+                _buildScoreItem('UAS', '${nilai['uas'] ?? '-'}'),
+              ],
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildScoreItem(String label, String value) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              fontSize: 8.5,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(value, style: AppTextStyles.bodyMedium.copyWith(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreDivider() {
+    return Container(width: 1, height: 22, color: AppColors.borderSubtle);
   }
 }

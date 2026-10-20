@@ -6,6 +6,8 @@ import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
 import '../../widgets/status_chip.dart';
+import '../../widgets/surface_card.dart';
+import '../../widgets/state_views.dart';
 
 class BeritaScreen extends StatefulWidget {
   const BeritaScreen({super.key});
@@ -50,9 +52,25 @@ class _BeritaScreenState extends State<BeritaScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const BlueHeader(
+        BlueHeader(
+          eyebrow: 'Kabar Sekolah',
           title: 'Berita & Pengumuman',
-          subtitle: 'Informasi terkini dari sekolah',
+          subtitle: 'Informasi terkini dari SMA Negeri 1 Bumiayu.',
+          height: 150,
+          trailing: Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+            ),
+            child: const Icon(
+              Icons.newspaper_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
         ),
         Expanded(child: _buildBody()),
       ],
@@ -61,87 +79,280 @@ class _BeritaScreenState extends State<BeritaScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: AppColors.primaryBlue,
-        ),
-      );
+      return const AppLoadingView(message: 'Memuat berita sekolah...');
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.cloud_off_rounded,
-                  size: 36,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodySecondary,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(onPressed: _load, child: const Text('Coba Lagi')),
-            ],
-          ),
-        ),
-      );
+      return AppErrorView(message: _error!, onRetry: _load);
     }
 
     final list = _pengumuman ?? [];
     if (list.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.newspaper_rounded,
-                size: 40,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text('Belum ada berita', style: AppTextStyles.cardTitle),
-            const SizedBox(height: 4),
-            Text(
-              'Berita terbaru akan muncul di sini',
-              style: AppTextStyles.smallText,
-            ),
-          ],
-        ),
+      return const AppEmptyView(
+        icon: Icons.newspaper_rounded,
+        title: 'Belum ada berita',
+        subtitle: 'Berita terbaru akan muncul di sini.',
       );
     }
 
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppConstants.responsivePadding(MediaQuery.of(context).size.width),
-        vertical: 20,
+    final first = list.first;
+    final rest = list.skip(1).toList();
+
+    return RefreshIndicator(
+      onRefresh: _load,
+      color: AppColors.primaryBlue,
+      backgroundColor: Colors.white,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          AppConstants.responsivePadding(MediaQuery.of(context).size.width),
+          20,
+          AppConstants.responsivePadding(MediaQuery.of(context).size.width),
+          28,
+        ),
+        children: [
+          _buildFeaturedCard(first),
+          if (rest.isNotEmpty) ...[
+            const SizedBox(height: 26),
+            Row(
+              children: [
+                Text('Semua Berita', style: AppTextStyles.sectionTitle),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlueTint,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    '${rest.length}',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            for (int i = 0; i < rest.length; i++) ...[
+              _buildBeritaCard(rest[i]),
+              if (i != rest.length - 1) const SizedBox(height: 10),
+            ],
+          ],
+        ],
       ),
-      itemCount: list.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 14),
-      itemBuilder: (context, index) => _buildBeritaCard(list[index]),
+    );
+  }
+
+  Widget _buildFeaturedCard(Map<String, dynamic> item) {
+    final kategori = (item['kategori'] ?? 'info') as String;
+    final createdAt = item['created_at'] != null
+        ? DateTime.tryParse(item['created_at'] as String)
+        : null;
+    final accent = _categoryColor(kategori);
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+            spreadRadius: -10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Cover abstrak karena data tidak menyertakan gambar.
+          Container(
+            height: 132,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  accent,
+                  Color.lerp(accent, AppColors.navy, 0.55) ?? accent,
+                ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -28,
+                  top: -34,
+                  child: Container(
+                    width: 170,
+                    height: 170,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.10),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 28,
+                  bottom: -44,
+                  child: Container(
+                    width: 130,
+                    height: 130,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.16),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 34,
+                  top: 34,
+                  child: Icon(
+                    _categoryIcon(kategori),
+                    color: Colors.white.withValues(alpha: 0.28),
+                    size: 64,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.22),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 5,
+                              height: 5,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'BERITA UTAMA',
+                              style: AppTextStyles.chipText.copyWith(
+                                color: Colors.white,
+                                fontSize: 8.5,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        kategori.toUpperCase(),
+                        style: AppTextStyles.chipText.copyWith(
+                          color: Colors.white.withValues(alpha: 0.75),
+                          fontSize: 9,
+                          letterSpacing: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 12,
+                      color: AppColors.textTertiary,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      createdAt != null
+                          ? DateFormat('EEEE, dd MMMM yyyy').format(createdAt)
+                          : '-',
+                      style: AppTextStyles.caption.copyWith(fontSize: 10),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 9),
+                Text(
+                  item['judul'] ?? '-',
+                  style: AppTextStyles.cardTitle.copyWith(
+                    fontSize: 18,
+                    height: 1.3,
+                    letterSpacing: -0.35,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  item['isi'] ?? '',
+                  style: AppTextStyles.bodySecondary.copyWith(fontSize: 12.5),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Text(
+                      'Baca selengkapnya',
+                      style: AppTextStyles.caption.copyWith(
+                        color: accent,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10.5,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_rounded, size: 13, color: accent),
+                    const Spacer(),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: Icon(
+                        Icons.bookmark_outline_rounded,
+                        size: 16,
+                        color: accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -151,81 +362,82 @@ class _BeritaScreenState extends State<BeritaScreen> {
         ? DateTime.tryParse(pengumuman['created_at'] as String)
         : null;
 
-    Color categoryColor;
-    String statusType;
+    final accent = _categoryColor(kategori);
+    final statusType = _statusType(kategori);
 
-    switch (kategori.toLowerCase()) {
-      case 'pengumuman':
-      case 'penting':
-        categoryColor = AppColors.accentYellow;
-        statusType = 'penting';
-        break;
-      case 'prestasi':
-        categoryColor = AppColors.chipGreenText;
-        statusType = 'selesai';
-        break;
-      case 'kegiatan':
-        categoryColor = AppColors.chipPurpleText;
-        statusType = 'kegiatan';
-        break;
-      default:
-        categoryColor = AppColors.primaryBlue;
-        statusType = 'info';
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
-      child: Column(
+    return SurfaceCard(
+      padding: const EdgeInsets.all(14),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Blok tanggal.
           Container(
-            height: 6,
+            width: 52,
+            padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: categoryColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
+              color: accent.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: accent.withValues(alpha: 0.12)),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  createdAt != null ? DateFormat('dd').format(createdAt) : '--',
+                  style: AppTextStyles.cardTitle.copyWith(
+                    color: accent,
+                    fontSize: 19,
+                    height: 1,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  createdAt != null
+                      ? DateFormat('MMM').format(createdAt).toUpperCase()
+                      : '---',
+                  style: AppTextStyles.caption.copyWith(
+                    color: accent,
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(18),
+          const SizedBox(width: 13),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     StatusChip(label: kategori.toUpperCase(), type: statusType),
+                    const Spacer(),
                     if (createdAt != null)
                       Text(
-                        DateFormat('dd MMM yyyy').format(createdAt),
-                        style: AppTextStyles.caption,
+                        DateFormat('yyyy').format(createdAt),
+                        style: AppTextStyles.caption.copyWith(fontSize: 9.5),
                       ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   pengumuman['judul'] ?? '-',
-                  style: AppTextStyles.cardTitle.copyWith(fontSize: 16),
+                  style: AppTextStyles.cardTitle.copyWith(
+                    fontSize: 14,
+                    height: 1.35,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 5),
                 Text(
                   pengumuman['isi'] ?? '',
-                  style: AppTextStyles.bodySecondary,
-                  maxLines: 3,
+                  style: AppTextStyles.smallText.copyWith(
+                    fontSize: 11.5,
+                    height: 1.45,
+                  ),
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -234,5 +446,46 @@ class _BeritaScreenState extends State<BeritaScreen> {
         ],
       ),
     );
+  }
+
+  Color _categoryColor(String kategori) {
+    switch (kategori.toLowerCase()) {
+      case 'pengumuman':
+      case 'penting':
+        return AppColors.accentAmber;
+      case 'prestasi':
+        return AppColors.accentMint;
+      case 'kegiatan':
+        return AppColors.accentPurple;
+      default:
+        return AppColors.primaryBlue;
+    }
+  }
+
+  String _statusType(String kategori) {
+    switch (kategori.toLowerCase()) {
+      case 'pengumuman':
+      case 'penting':
+        return 'penting';
+      case 'prestasi':
+        return 'selesai';
+      case 'kegiatan':
+        return 'kegiatan';
+      default:
+        return 'info';
+    }
+  }
+
+  IconData _categoryIcon(String kategori) {
+    switch (kategori.toLowerCase()) {
+      case 'prestasi':
+        return Icons.emoji_events_rounded;
+      case 'kegiatan':
+        return Icons.celebration_rounded;
+      case 'pengumuman':
+        return Icons.campaign_rounded;
+      default:
+        return Icons.article_rounded;
+    }
   }
 }

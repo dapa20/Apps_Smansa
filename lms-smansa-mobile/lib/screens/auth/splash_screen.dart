@@ -52,176 +52,236 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryBlue,
+      backgroundColor: AppColors.navy,
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1D4ED8),
-              Color(0xFF2563EB),
-              Color(0xFF3B82F6),
-            ],
-            stops: [0.0, 0.55, 1.0],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: AppColors.heroGradient,
+            stops: [0.0, 0.38, 0.72, 1.0],
           ),
         ),
         child: Stack(
           children: [
-            // Decorative blobs
+            // Grid halus.
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(painter: _SplashGridPainter()),
+              ),
+            ),
+            // Glow cyan kanan atas.
             Positioned(
-              top: -60,
-              left: -60,
+              top: -90,
+              right: -110,
               child: Container(
-                width: 220,
-                height: 220,
+                width: 340,
+                height: 340,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.06),
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.accentCyan.withValues(alpha: 0.26),
+                      AppColors.accentCyan.withValues(alpha: 0.0),
+                    ],
+                  ),
                 ),
               ),
             ),
+            // Glow biru kiri bawah.
             Positioned(
-              bottom: -80,
-              right: -80,
+              bottom: -140,
+              left: -110,
               child: Container(
-                width: 260,
-                height: 260,
+                width: 380,
+                height: 380,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: AppColors.primaryBlue.withValues(alpha: 0.18),
                 ),
               ),
             ),
-            Positioned(
-              top: 120,
-              right: 40,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.04),
-                ),
-              ),
-            ),
+            // Cincin dekoratif.
+            Positioned(top: 110, right: -68, child: _OutlineRing(size: 220)),
+            Positioned(bottom: 150, left: -90, child: _OutlineRing(size: 240)),
 
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 24,
+                  horizontal: 28,
+                  vertical: 22,
                 ),
                 child: Column(
                   children: [
                     const Spacer(flex: 2),
-
-                    // ─── Logo ──────────────────────────────────────────
-                    Container(
-                      width: 116,
-                      height: 116,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.20),
-                            blurRadius: 28,
-                            offset: const Offset(0, 8),
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: 1),
+                      duration: const Duration(milliseconds: 850),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Transform.translate(
+                            offset: Offset(0, 24 * (1 - value)),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          // Logo dengan cincin gradient.
+                          Container(
+                            width: 152,
+                            height: 152,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.55),
+                                  Colors.white.withValues(alpha: 0.08),
+                                  AppColors.accentCyan.withValues(alpha: 0.5),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.accentCyan.withValues(
+                                    alpha: 0.22,
+                                  ),
+                                  blurRadius: 40,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/logo_smansa.png',
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.school_rounded,
+                                      size: 60,
+                                      color: AppColors.primaryBlue,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 34),
+                          Text(
+                            AppConstants.schoolName,
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.headerTitle.copyWith(
+                              fontSize: 28,
+                              letterSpacing: -0.8,
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.16),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 5,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.accentCyan,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  AppConstants.tagline,
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                    fontSize: 9.5,
+                                    letterSpacing: 1.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/logo_smansa.png',
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.school,
-                              size: 60,
-                              color: AppColors.primaryBlue,
-                            );
-                          },
-                        ),
-                      ),
                     ),
-
-                    const SizedBox(height: 32),
-
-                    // ─── Nama Sekolah ──────────────────────────────────
-                    Text(
-                      AppConstants.schoolName,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.headerTitle.copyWith(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                        letterSpacing: -0.4,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ─── Tagline ───────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.18),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        AppConstants.tagline,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.caption.copyWith(
-                          color: Colors.white,
-                          fontSize: 11,
-                          letterSpacing: 1.6,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-
                     const Spacer(flex: 3),
-
-                    // ─── Loading ───────────────────────────────────────
-                    const SizedBox(
-                      width: 28,
-                      height: 28,
-                      child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
-                        strokeWidth: 3,
+                    // Loading bar tipis + teks.
+                    SizedBox(
+                      width: 132,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(999),
+                        child: const LinearProgressIndicator(
+                          minHeight: 3,
+                          backgroundColor: Color(0x26FFFFFF),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-
-                    const SizedBox(height: 18),
-
-                    // ─── Versi ─────────────────────────────────────────
+                    const SizedBox(height: 16),
                     Text(
-                      'Loading ${AppConstants.appName}...',
+                      'Menyiapkan ruang belajar...',
                       style: AppTextStyles.caption.copyWith(
-                        color: Colors.white70,
+                        color: Colors.white.withValues(alpha: 0.62),
+                        fontSize: 11,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppConstants.appVersion,
-                      style: AppTextStyles.caption.copyWith(
-                        color: Colors.white54,
-                        fontSize: 10,
-                      ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppConstants.appName,
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.white.withValues(alpha: 0.36),
+                            fontSize: 9.5,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                        Container(
+                          width: 3,
+                          height: 3,
+                          margin: const EdgeInsets.symmetric(horizontal: 7),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.24),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Text(
+                          AppConstants.appVersion,
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.white.withValues(alpha: 0.36),
+                            fontSize: 9.5,
+                          ),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -231,4 +291,46 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
+}
+
+class _OutlineRing extends StatelessWidget {
+  final double size;
+
+  const _OutlineRing({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.06),
+            width: 1,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SplashGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.035)
+      ..strokeWidth = 1;
+
+    for (double x = 0; x < size.width; x += 40) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += 40) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -4,7 +4,8 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../widgets/blue_header.dart';
-import '../../widgets/back_button_overlay.dart';
+import '../../widgets/surface_card.dart';
+import '../../widgets/state_views.dart';
 
 class JadwalScreen extends StatefulWidget {
   const JadwalScreen({super.key});
@@ -72,28 +73,54 @@ class _JadwalScreenState extends State<JadwalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: const BackLeadingButton(),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        title: Text(
-          AppConstants.appName,
-          style: AppTextStyles.cardTitle.copyWith(
-            color: AppColors.primaryBlue,
-            fontSize: 18,
-          ),
-        ),
-      ),
       body: Column(
         children: [
-          BlueHeader(
-            title: 'Jadwal Pelajaran',
-            subtitle: AppConstants.currentSemester,
-            height: 140,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              BlueHeader(
+                eyebrow: 'Agenda Belajar',
+                title: 'Jadwal Pelajaran',
+                subtitle: AppConstants.currentSemester,
+                height: 110,
+                showBackButton: true,
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 11,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.today_rounded,
+                        color: AppColors.accentAmber,
+                        size: 13,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        _selectedHari,
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(bottom: -28, left: 16, right: 16, child: _buildTabs()),
+            ],
           ),
-          _buildTabs(),
+          const SizedBox(height: 46),
           Expanded(child: _buildTimeline()),
         ],
       ),
@@ -102,11 +129,23 @@ class _JadwalScreenState extends State<JadwalScreen> {
 
   Widget _buildTabs() {
     return Container(
-      color: Colors.white,
-      height: 64,
+      height: 60,
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.navy.withValues(alpha: 0.10),
+            blurRadius: 22,
+            offset: const Offset(0, 8),
+            spreadRadius: -8,
+          ),
+        ],
+      ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _hari.length,
         itemBuilder: (context, index) {
           final hari = _hari[index];
@@ -119,32 +158,37 @@ class _JadwalScreenState extends State<JadwalScreen> {
               });
             },
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              margin: const EdgeInsets.symmetric(
-                horizontal: 4,
-                vertical: 14,
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 8,
-              ),
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryBlue : Colors.transparent,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(
-                  color: isSelected
-                      ? AppColors.primaryBlue
-                      : AppColors.borderSubtle,
-                ),
+                gradient: isSelected
+                    ? const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: AppColors.primaryGradient,
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primaryBlue.withValues(alpha: 0.28),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                          spreadRadius: -4,
+                        ),
+                      ]
+                    : null,
               ),
               alignment: Alignment.center,
               child: Text(
                 hari,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: isSelected
-                      ? Colors.white
-                      : AppColors.textSecondary,
+                  color: isSelected ? Colors.white : AppColors.textSecondary,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 12.5,
                 ),
               ),
             ),
@@ -156,211 +200,185 @@ class _JadwalScreenState extends State<JadwalScreen> {
 
   Widget _buildTimeline() {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: AppColors.primaryBlue,
-        ),
-      );
+      return const AppLoadingView(message: 'Memuat jadwal pelajaran...');
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.cloud_off_rounded,
-                  size: 36,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodySecondary,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(onPressed: _load, child: const Text('Coba Lagi')),
-            ],
-          ),
-        ),
-      );
+      return AppErrorView(message: _error!, onRetry: _load);
     }
 
     final jadwalList = _jadwalSelected;
 
     if (jadwalList.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.event_busy_rounded,
-                size: 40,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Tidak ada jadwal $_selectedHari',
-              style: AppTextStyles.bodySecondary,
-            ),
-          ],
-        ),
+      return AppEmptyView(
+        icon: Icons.event_busy_rounded,
+        title: 'Tidak ada jadwal',
+        subtitle: 'Belum ada pelajaran untuk hari $_selectedHari.',
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      itemCount: jadwalList.length,
-      itemBuilder: (context, index) {
-        final jadwal = jadwalList[index];
-        final isLast = index == jadwalList.length - 1;
+    return RefreshIndicator(
+      onRefresh: _load,
+      color: AppColors.primaryBlue,
+      backgroundColor: Colors.white,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(18, 6, 18, 26),
+        itemCount: jadwalList.length,
+        itemBuilder: (context, index) {
+          final jadwal = jadwalList[index];
+          final isLast = index == jadwalList.length - 1;
 
-        return IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                width: 60,
-                child: Column(
-                  children: [
-                    Text(
-                      jadwal['jam_mulai'] ?? '--:--',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.primaryBlue,
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 54,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 26,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryBlueTint,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          jadwal['jam_mulai'] ?? '--:--',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.primaryBlue,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 9.5,
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Expanded(
-                      child: Container(
-                        width: 2,
-                        color: isLast
-                            ? Colors.transparent
-                            : AppColors.primaryBlue.withValues(alpha: 0.25),
+                      const SizedBox(height: 5),
+                      Expanded(
+                        child: Container(
+                          width: 2,
+                          decoration: BoxDecoration(
+                            color: isLast
+                                ? Colors.transparent
+                                : AppColors.borderStrong,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _buildScheduleCard(jadwal),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildScheduleCard(jadwal),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildScheduleCard(Map<String, dynamic> jadwal) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+    final namaGuru = (jadwal['nama_guru'] ?? '').toString();
+    final ruang = (jadwal['ruang'] ?? '').toString();
+    final isIstirahat = (jadwal['nama_mapel'] ?? '')
+        .toString()
+        .toLowerCase()
+        .contains('istirahat');
+
+    return SurfaceCard(
+      padding: const EdgeInsets.all(15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AppIconTile(
+                icon: isIstirahat
+                    ? Icons.free_breakfast_rounded
+                    : Icons.menu_book_rounded,
+                color: isIstirahat
+                    ? AppColors.accentAmber
+                    : AppColors.primaryBlue,
+                size: 40,
+                iconSize: 19,
+                radius: 12,
+              ),
+              const SizedBox(width: 11),
               Expanded(
-                child: Text(
-                  jadwal['nama_mapel'] ?? '-',
-                  style: AppTextStyles.cardTitle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      jadwal['nama_mapel'] ?? '-',
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 14),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: 12,
+                          color: AppColors.textTertiary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${jadwal['jam_mulai'] ?? ''} – ${jadwal['jam_selesai'] ?? ''}',
+                          style: AppTextStyles.caption.copyWith(fontSize: 9.5),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlueTint,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  '${jadwal['jam_mulai'] ?? ''} – ${jadwal['jam_selesai'] ?? ''}',
-                  style: AppTextStyles.chipText.copyWith(
-                    color: AppColors.primaryBlue,
+            ],
+          ),
+          if (!isIstirahat) ...[
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: AppColors.divider),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMeta(
+                    Icons.person_outline_rounded,
+                    namaGuru.isNotEmpty ? namaGuru : '-',
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(
-                Icons.person_outline_rounded,
-                size: 16,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  (jadwal['nama_guru'] ?? '').toString().isNotEmpty
-                      ? jadwal['nama_guru'] as String
-                      : '-',
-                  style: AppTextStyles.bodySecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.room_outlined,
-                size: 16,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  jadwal['ruang'] ?? '',
-                  style: AppTextStyles.bodySecondary,
-                ),
-              ),
-            ],
-          ),
+                if (ruang.isNotEmpty) ...[
+                  const SizedBox(width: 10),
+                  Flexible(child: _buildMeta(Icons.room_outlined, ruang)),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildMeta(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 13, color: AppColors.textTertiary),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(
+            text,
+            style: AppTextStyles.smallText.copyWith(fontSize: 10.5),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

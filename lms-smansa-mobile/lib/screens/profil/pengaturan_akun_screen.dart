@@ -4,7 +4,9 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/api/api_repository.dart';
 import '../../core/api/auth_service.dart';
-import '../../widgets/back_button_overlay.dart';
+import '../../widgets/blue_header.dart';
+import '../../widgets/responsive_container.dart';
+import '../../widgets/surface_card.dart';
 import '../../app/routes.dart';
 import '../../app/notification_badge_controller.dart';
 
@@ -48,7 +50,8 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
       if (!mounted) return;
 
       final success = res['success'] == true;
-      final message = res['message']?.toString() ??
+      final message =
+          res['message']?.toString() ??
           (success ? 'Password berhasil diubah.' : 'Gagal mengubah password.');
 
       if (success) {
@@ -59,7 +62,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           context: context,
           builder: (ctx) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
             ),
             title: const Row(
               children: [
@@ -97,7 +100,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Row(
           children: [
             Icon(Icons.error_outline_rounded, color: AppColors.dangerRed),
@@ -120,7 +123,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text('Keluar'),
         content: const Text('Anda yakin ingin keluar dari akun ini?'),
         actions: [
@@ -151,32 +154,41 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryBlue,
-        leading: const BackLeadingButton(color: Colors.white),
-        title: Text(
-          'Pengaturan Akun',
-          style: AppTextStyles.headerTitle.copyWith(fontSize: 18),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.screenPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('KEAMANAN'),
-              const SizedBox(height: 12),
-              _buildPasswordCard(),
-              const SizedBox(height: 24),
-              _buildSectionTitle('LAINNYA'),
-              const SizedBox(height: 12),
-              _buildAboutCard(),
-              const SizedBox(height: 16),
-              _buildLogoutCard(),
-              const SizedBox(height: 24),
+              const BlueHeader(
+                eyebrow: 'Keamanan Akun',
+                title: 'Pengaturan Akun',
+                subtitle: 'Perbarui password dan kelola informasi akunmu.',
+                height: 96,
+                showBackButton: true,
+              ),
+              const SizedBox(height: 20),
+              ResponsivePadding(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SectionLabel(
+                      'Keamanan',
+                      padding: EdgeInsets.only(left: 4, bottom: 12),
+                    ),
+                    _buildPasswordCard(),
+                    const SizedBox(height: 24),
+                    const SectionLabel(
+                      'Lainnya',
+                      padding: EdgeInsets.only(left: 4, bottom: 12),
+                    ),
+                    _buildAboutCard(),
+                    const SizedBox(height: 16),
+                    _buildLogoutCard(),
+                    const SizedBox(height: 28),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -184,63 +196,43 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Text(
-        label,
-        style: AppTextStyles.caption.copyWith(
-          color: AppColors.textSecondary,
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-
   Widget _buildPasswordCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-            spreadRadius: -2,
-          ),
-        ],
-      ),
+    final baru = _passwordBaruC.text;
+    final hasLength = baru.length >= 6;
+    final hasLetter = RegExp(r'[A-Za-z]').hasMatch(baru);
+    final hasNumber = RegExp(r'[0-9]').hasMatch(baru);
+    final strength = [
+      hasLength,
+      hasLetter,
+      hasNumber,
+    ].where((element) => element).length;
+
+    return SurfaceCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlueTint,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.lock_outline_rounded,
-                  color: AppColors.primaryBlue,
-                  size: 22,
-                ),
+              const AppIconTile(
+                icon: Icons.shield_outlined,
+                color: AppColors.primaryBlue,
+                size: 42,
+                iconSize: 20,
+                radius: 13,
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ubah Password', style: AppTextStyles.cardTitle),
-                    const SizedBox(height: 2),
                     Text(
-                      'Pastikan password baru minimal 6 karakter & kombinasi huruf-angka.',
-                      style: AppTextStyles.smallText,
+                      'Ubah Password',
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 14.5),
+                    ),
+                    Text(
+                      'Gunakan kombinasi huruf dan angka yang kuat.',
+                      style: AppTextStyles.smallText.copyWith(fontSize: 10.5),
                     ),
                   ],
                 ),
@@ -249,7 +241,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           ),
           const SizedBox(height: 20),
           _buildLabel('Password Saat Ini'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           TextFormField(
             controller: _passwordLamaC,
             obscureText: _obscureLama,
@@ -265,11 +257,12 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           ),
           const SizedBox(height: 16),
           _buildLabel('Password Baru'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           TextFormField(
             controller: _passwordBaruC,
             obscureText: _obscureBaru,
             style: AppTextStyles.bodyMedium,
+            onChanged: (_) => setState(() {}),
             decoration: _buildInputDecoration(
               hint: 'Minimal 6 karakter, huruf & angka',
               icon: Icons.lock_reset_rounded,
@@ -290,9 +283,41 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
               return null;
             },
           ),
+          const SizedBox(height: 10),
+          // Indikator kekuatan password (visual, tidak mengubah validasi).
+          Row(
+            children: List.generate(3, (index) {
+              final active = strength > index;
+              final color = strength == 1
+                  ? AppColors.dangerRed
+                  : strength == 2
+                  ? AppColors.accentAmber
+                  : AppColors.accentMint;
+              return Expanded(
+                child: Container(
+                  height: 4,
+                  margin: EdgeInsets.only(right: index == 2 ? 0 : 5),
+                  decoration: BoxDecoration(
+                    color: active ? color : AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              _buildRequirement('6+ karakter', hasLength),
+              _buildRequirement('Huruf', hasLetter),
+              _buildRequirement('Angka', hasNumber),
+            ],
+          ),
           const SizedBox(height: 16),
           _buildLabel('Konfirmasi Password Baru'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           TextFormField(
             controller: _passwordKonfirmasiC,
             obscureText: _obscureKonfirmasi,
@@ -301,8 +326,8 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
               hint: 'Ketik ulang password baru',
               icon: Icons.lock_reset_rounded,
               obscure: _obscureKonfirmasi,
-              onToggle: () => setState(
-                  () => _obscureKonfirmasi = !_obscureKonfirmasi),
+              onToggle: () =>
+                  setState(() => _obscureKonfirmasi = !_obscureKonfirmasi),
             ),
             validator: (v) {
               if (v == null || v.isEmpty) {
@@ -317,7 +342,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
-            height: 48,
+            height: 50,
             child: ElevatedButton.icon(
               onPressed: _isSaving ? null : _handleSimpanPassword,
               icon: _isSaving
@@ -326,7 +351,7 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
                       height: 18,
                       child: CircularProgressIndicator(
                         color: Colors.white,
-                        strokeWidth: 2.5,
+                        strokeWidth: 2.4,
                       ),
                     )
                   : const Icon(Icons.save_rounded, size: 18),
@@ -338,97 +363,114 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     );
   }
 
+  Widget _buildRequirement(String label, bool met) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          met
+              ? Icons.check_circle_rounded
+              : Icons.radio_button_unchecked_rounded,
+          size: 13,
+          color: met ? AppColors.accentMint : AppColors.textTertiary,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: AppTextStyles.caption.copyWith(
+            fontSize: 9.5,
+            color: met ? AppColors.accentMint : AppColors.textTertiary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildLabel(String text) {
     return Text(
-      text,
-      style: AppTextStyles.caption.copyWith(
+      text.toUpperCase(),
+      style: AppTextStyles.eyebrow.copyWith(
         color: AppColors.textSecondary,
-        fontSize: 12,
+        fontSize: 9.5,
+        letterSpacing: 1.1,
       ),
     );
   }
 
   Widget _buildAboutCard() {
-    return Container(
+    return SurfaceCard(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-            spreadRadius: -2,
-          ),
-        ],
-      ),
       child: Column(
         children: [
-          _buildInfoTile(
-            icon: Icons.school_rounded,
-            title: AppConstants.schoolName,
-            subtitle: AppConstants.tagline,
-          ),
-          const Divider(color: AppColors.divider, height: 24),
-          _buildInfoRow('Versi Aplikasi', AppConstants.appVersion),
-          const SizedBox(height: 10),
-          _buildInfoRow(
-            'Semester Aktif',
-            AppConstants.currentSemester,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppColors.primaryBlueTint,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: AppColors.primaryBlue, size: 22),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(title, style: AppTextStyles.bodyMedium),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: AppTextStyles.smallText,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              const AppIconTile(
+                icon: Icons.school_rounded,
+                color: AppColors.primaryBlue,
+                size: 42,
+                iconSize: 20,
+                radius: 13,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppConstants.schoolName,
+                      style: AppTextStyles.cardTitle.copyWith(fontSize: 13.5),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      AppConstants.tagline,
+                      style: AppTextStyles.caption.copyWith(fontSize: 8.5),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Column(
+              children: [
+                _buildInfoRow('Versi Aplikasi', AppConstants.appVersion),
+                const Divider(height: 1, color: AppColors.divider),
+                _buildInfoRow('Semester Aktif', AppConstants.currentSemester),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: AppTextStyles.bodySecondary),
-        Text(
-          value,
-          style: AppTextStyles.bodyMedium,
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Text(label, style: AppTextStyles.smallText.copyWith(fontSize: 11.5)),
+          const Spacer(),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: AppTextStyles.bodyMedium.copyWith(fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -436,35 +478,46 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         onTap: _handleLogout,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
           decoration: BoxDecoration(
             color: AppColors.chipRedBg,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: AppColors.dangerRed.withValues(alpha: 0.15),
+              color: AppColors.dangerRed.withValues(alpha: 0.12),
               width: 1,
             ),
           ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              Icon(
-                Icons.logout_rounded,
-                color: AppColors.dangerRed,
-                size: 20,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Keluar dari Akun',
-                style: TextStyle(
-                  color: AppColors.dangerRed,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  letterSpacing: 0.1,
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: AppColors.dangerRed,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Keluar dari akun',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.dangerRed,
+                  fontSize: 13,
+                ),
+              ),
+              const Spacer(),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                color: AppColors.dangerRed,
+                size: 17,
               ),
             ],
           ),
@@ -483,38 +536,24 @@ class _PengaturanAkunScreenState extends State<PengaturanAkunScreen> {
       hintText: hint,
       hintStyle: AppTextStyles.bodySecondary.copyWith(
         color: AppColors.textTertiary,
+        fontSize: 12.5,
       ),
-      prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
+      prefixIcon: Padding(
+        padding: const EdgeInsets.only(left: 14, right: 10),
+        child: Icon(icon, color: AppColors.textSecondary, size: 19),
+      ),
+      prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
       suffixIcon: IconButton(
         icon: Icon(
           obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
           color: AppColors.textSecondary,
-          size: 20,
+          size: 19,
         ),
         onPressed: onToggle,
       ),
       filled: true,
-      fillColor: AppColors.surfaceMuted,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 14,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.borderSubtle, width: 1),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.6),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.dangerRed, width: 1),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.dangerRed, width: 1.6),
-      ),
+      fillColor: AppColors.surfaceAlt,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 }

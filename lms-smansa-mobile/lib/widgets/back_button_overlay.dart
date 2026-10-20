@@ -1,37 +1,13 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 
-/// Tombol back reusable yang dipasang di atas header (mis. BlueHeader).
+/// Tombol kembali reusable yang dipasang di atas header.
 ///
-/// Dipakai untuk halaman yang tidak memiliki `Scaffold.appBar` tapi
-/// tetap membutuhkan tombol kembali. Styling: lingkaran semi-transparan
-/// dengan ikon putih, sehingga tetap terbaca di atas gradient biru.
-///
-/// Contoh pemakaian:
-///
-/// ```dart
-/// Scaffold(
-///   body: Stack(
-///     children: [
-///       Column(
-///         children: [
-///           const BlueHeader(title: 'Tugas Saya'),
-///           // ...konten
-///         ],
-///       ),
-///       const BackButtonOverlay(),
-///     ],
-///   ),
-/// )
-/// ```
+/// Gaya baru: lingkaran glass blur dengan border tipis putih.
 class BackButtonOverlay extends StatelessWidget {
-  /// Jika null, akan otomatis memanggil `Navigator.maybePop(context)`.
   final VoidCallback? onPressed;
-
-  /// Padding dari atas setelah SafeArea (default: 8).
   final double topPadding;
-
-  /// Padding dari kiri (default: 8).
   final double leftPadding;
 
   const BackButtonOverlay({
@@ -43,9 +19,7 @@ class BackButtonOverlay extends StatelessWidget {
 
   void _defaultOnPressed(BuildContext context) {
     final navigator = Navigator.of(context);
-    if (navigator.canPop()) {
-      navigator.pop();
-    }
+    if (navigator.canPop()) navigator.pop();
   }
 
   @override
@@ -59,16 +33,26 @@ class BackButtonOverlay extends StatelessWidget {
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: () => onPressed ?? _defaultOnPressed(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.25),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 22,
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.14),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.25),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: Colors.white,
+                    size: 21,
+                  ),
+                ),
               ),
             ),
           ),
@@ -78,10 +62,7 @@ class BackButtonOverlay extends StatelessWidget {
   }
 }
 
-/// Versi tombol back yang cocok untuk `Scaffold.appBar`.
-///
-/// Wrapper kecil agar konsisten warna/iconTheme dengan halaman lain.
-/// Pakai ini sebagai `appBar.leading` jika ingin konsisten.
+/// Versi tombol back untuk `Scaffold.appBar` (bila masih digunakan).
 class BackLeadingButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color color;
@@ -94,15 +75,33 @@ class BackLeadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onLightSurface = color != Colors.white;
+
     return IconButton(
-      icon: Icon(Icons.arrow_back, color: color),
       tooltip: 'Kembali',
-      onPressed: onPressed ?? () {
-        final navigator = Navigator.of(context);
-        if (navigator.canPop()) {
-          navigator.pop();
-        }
-      },
+      onPressed:
+          onPressed ??
+          () {
+            final navigator = Navigator.of(context);
+            if (navigator.canPop()) navigator.pop();
+          },
+      icon: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: onLightSurface
+              ? AppColors.surfaceMuted
+              : Colors.white.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: onLightSurface
+                ? AppColors.borderSubtle
+                : Colors.white.withValues(alpha: 0.18),
+            width: 1,
+          ),
+        ),
+        child: Icon(Icons.arrow_back_rounded, color: color, size: 20),
+      ),
     );
   }
 }
